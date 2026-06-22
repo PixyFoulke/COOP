@@ -1,0 +1,134 @@
+import cv2
+import time
+import requests
+from ultralytics import YOLO
+import winsound
+
+
+def trigger_alarm():
+    winsound.Beep(1500, 1000)
+
+
+# Load model
+model = YOLO('exp-4.pt')
+
+# Camera utilities separated from app logic
+
+
+def init_camera(device=0, width=640, height=480):
+    cap = cv2.VideoCapture(device)
+    cap.set(3, width)  # width
+    cap.set(4, height)  # height
+    return cap
+
+
+def read_frame(cap):
+    if cap is None:
+        return False, None
+    return cap.read()
+
+
+def release_camera(cap):
+    if cap is not None:
+        cap.release()
+
+
+def _scalar_value(value):
+    if value is None:
+        return None
+    if isinstance(value, (str, bytes)):
+        return value
+    if hasattr(value, "item"):
+        try:
+            return value.item()
+        except Exception:
+            pass
+    if hasattr(value, "__len__") and len(value) == 1:
+        return _scalar_value(value[0])
+    return value
+
+
+cap = init_camera()
+if not cap.isOpened():
+    raise RuntimeError('Unable to open camera')
+
+while True:
+    chicken_count = 0
+    ret, frame = read_frame(cap)
+    if not ret or frame is None:
+        break
+
+    results = model.track(frame, persist=True)
+    if results is None:
+        continue
+
+    alert = False
+    for result in results:
+        boxes = getattr(result, "boxes", None)
+        if boxes is None:
+            continue
+        for box in boxes:
+            xyxy = getattr(box, "xyxy", None)
+            if xyxy is None:
+                continue
+            if hasattr(xyxy, "ndim") and xyxy.ndim > 1:
+                xyxy = xyxy[0]
+            if not hasattr(xyxy, "__len__") or len(xyxy) != 4:
+                continue
+            x1, y1, x2, y2 = [int(_scalar_value(v)) for v in xyxy]
+            conf = float(_scalar_value(getattr(box, "conf", 0)) or 0)
+            cls_idx = int(_scalar_value(getattr(box, "cls", 0)) or 0)
+            if isinstance(result.names, dict):
+                cls = result.names.get(cls_idx, str(cls_idx))
+            else:
+                cls = result.names[cls_idx]
+            box_id = _scalar_value(getattr(box, "id", None))
+            track_id = int(box_id) if box_id is not None else -1
+            if cls == "Chicken":
+                chicken_count += 1
+                color = (50, 144, 10)   # Green
+            else:
+                color = (0, 0, 255)   # Red
+                alert = True
+            cv2.rectangle(frame,
+                          (x1, y1),
+                          (x2, y2),
+                          color,
+                          2)
+            cv2.putText(frame,
+                        f"{cls} | ID:{track_id} | {conf*100:.0f}%",
+                        (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        color,
+                        2)
+    if alert:
+        trigger_alarm()
+
+    cv2.putText(frame,
+                "C.O.O.P",
+                (10, 25),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (255, 215, 0),
+                2)
+    cv2.putText(frame,
+                f"Chickens: {chicken_count}",
+                (10, 55),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.7,
+                (255, 255, 255),
+                2)
+    current_time = time.strftime("%H:%M:%S")
+    cv2.putText(frame,
+                f"Time: {current_time}",
+                (10, 85),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (255, 255, 255),
+                2)
+    cv2.imshow('C.O.O.P Live Detection', frame)
+    if cv2.waitKey(1) == ord('q'):
+        break
+release_camera(cap)
+cv2.destroyAllWindows()
