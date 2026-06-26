@@ -10,7 +10,7 @@ import winsound
 def trigger_alarm():
     winsound.Beep(1500, 1000)
     sender = "coopdetection@gmail.com"
-    app_password = "jrtk rzgk yumd rtzs"
+    app_password = "password"
     recipient = "joshua.deree@icloud.com"
     msg = EmailMessage()
     msg["Subject"] = "Chicken Coop Alert"
