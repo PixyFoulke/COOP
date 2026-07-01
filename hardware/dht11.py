@@ -1,34 +1,28 @@
 # - Jax/Rune Stitt
-#DHT11 Sensor on GPIO 4
-#DHT11 Documentation: https://shorturl.at/Jqfl2
+# DHT11 standalone test script
+# DHT11 Sensor on GPIO 4
+
+import time
 import adafruit_dht
 import board
-import time
 
+sensor = adafruit_dht.DHT11(board.D4)
 
-_sensor = adafruit_dht.DHT11(board.D4)
+print("Reading DHT11 (Ctrl+C to stop)...\n")
 
-def _read():
-    for _ in range(5):
+try:
+    while True:
         try:
-            return _sensor.temperature, _sensor.humidity
-        except RuntimeError:
-            time.sleep(2)
-    return None, None
+            temp_c = sensor.temperature
+            temp_f = temp_c * 9 / 5 + 32
+            humidity = sensor.humidity
+            print(f"Temp: {temp_c:.1f}C / {temp_f:.1f}F  |  Humidity: {humidity:.1f}%")
+        except RuntimeError as e:
+            # DHT11 read failures are common/expected, just retry
+            print(f"Read error: {e.args[0]}")
 
-def getTemperature(unit=0):
-    #0 = Celsius, 1 = Fahrenheit
-    temp_c, _ = _read()
-    if temp_c is None:
-        return None
-    return temp_c if unit == 0 else temp_c * 9/5 + 32
+        time.sleep(2)
 
-def getHumidity(unit=0):
-    #0 = Percent, 1 = Raw
-    _, humidity = _read()
-    if humidity is None:
-        return None
-    return humidity if unit == 0 else humidity / 100.0
-
-def cleanup():
-    _sensor.exit()
+except KeyboardInterrupt:
+    print("Stopped.")
+    sensor.exit()
