@@ -1,17 +1,20 @@
-# code needs to be run from the COOP directory
 
-import os
-import cv2
+# code for processing the yolo detection results and labeling them
+
 from ultralytics import YOLO
 from picamera2 import Picamera2
+import cv2
+import os
+import time
 
-# Model path (safe)
+from ai.classifier import classify
+from ai.actions import trigger_alarm, safe_state, warning_state
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "outsidecoop.pt")
+MODEL_PATH = os.path.join(BASE_DIR, "models", "outsidecoop.pt")
 
 model = YOLO(MODEL_PATH)
 
-# Camera
 picam2 = Picamera2()
 config = picam2.create_preview_configuration(
     main={"format": "RGB888", "size": (640, 480)}
@@ -19,19 +22,40 @@ config = picam2.create_preview_configuration(
 picam2.configure(config)
 picam2.start()
 
-print("COOP Detection Running... Press 'q' to quit")
+print("Running safety layer...")
 
 while True:
     frame = picam2.capture_array()
 
-    # YOLO inference
     results = model(frame, verbose=False)
 
-    annotated_frame = results[0].plot()
+    detections = results[0].boxes
 
-    cv2.imshow("COOP Detection", annotated_frame)
+    threats = []
+    unknowns = []
 
-    if cv2.waitKey(1) & 0xFF == ord("q"):
+    for box in detections:
+        cls_id = int(box.cls[0])
+        label = model.names[cls_id]
+
+        status = classify(label)
+
+        if status == "THREAT":
+            threats.append(label)
+        elif status == "UNKNOWN":
+            unknowns.append(label)
+
+    if len(threats) > 0:
+        trigger_alarm()
+    elif len(unknowns) > 0:
+        warning_state()
+    else:
+        safe_state()
+
+    annotated = results[0].plot()
+    cv2.imshow("COOP Safety System", annotated)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cv2.destroyAllWindows()

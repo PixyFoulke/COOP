@@ -1,3 +1,6 @@
+
+# code for sending email alerts when a threat is detected
+
 import smtplib
 from email.message import EmailMessage
 import cv2
