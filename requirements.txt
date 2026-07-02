@@ -6,3 +6,6 @@ adafruit-circuitpython-dht
 adafruit-circuitpython-ssd1306
 Pillow
 i2c-tools
+opencv-python
+ultralytics
+requests
