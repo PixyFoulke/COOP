@@ -31,16 +31,16 @@ def _render_dashboard():
     image = Image.new("1", (128, 64))
     draw = ImageDraw.Draw(image)
 
-    # --- Read sensors ---
+    # Read sensors
     temp_c = getTemperature(unit=0)
     temp_f = getTemperature(unit=1)
     hum = getHumidity(unit=0)
 
-    # --- Convert ---
+    # Convert
     temp_f_str = f"{temp_f:.1f}F" if temp_f else "N/A"
     hum_str = f"{hum:.0f}%" if hum else "N/A"
 
-    # --- COOP status formatting ---
+    # COOP status formatting
     if COOP_STATUS == "THREAT":
         coop = "THREAT!"
     elif COOP_STATUS == "UNKNOWN":
@@ -48,13 +48,13 @@ def _render_dashboard():
     else:
         coop = "SAFE"
 
-    # --- Draw text ---
+    # Draw text
     draw.text((0, 0), f"T:{temp_f_str}  H:{hum_str}", fill=255)
     draw.text((0, 16), f"COOP: {coop}", fill=255)
 
     draw.text((0, 32), "SYSTEM ACTIVE", fill=255)
 
-    # --- Push to OLED ---
+    # Push to OLED
     _oled.image(image)
     _oled.show()
 
