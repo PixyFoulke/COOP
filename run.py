@@ -43,9 +43,12 @@ while True:
     temp = getTemperature()
     humidity = getHumidity()
 
-    # SAFE FALLBACKS
+    # SAFE FALLBACKS + FAHRENHEIT CONVERSION
     if temp is None:
-        temp = 0
+        temp_f = 0
+    else:
+        temp_f = (temp * 9/5) + 32
+
     if humidity is None:
         humidity = 0
 
@@ -55,7 +58,7 @@ while True:
     if len(threats) > 0:
         trigger_alarm()
 
-        update_status("THREAT", temp, humidity, current_time)
+        update_status("THREAT", temp_f, humidity, current_time)
 
         if time.time() - last_email_time > EMAIL_COOLDOWN:
             send_email_alert()
@@ -64,12 +67,12 @@ while True:
     elif len(unknowns) > 0:
         warning_state()
 
-        update_status("UNKNOWN", temp, humidity, current_time)
+        update_status("UNKNOWN", temp_f, humidity, current_time)
 
     else:
         safe_state()
 
-        update_status("SAFE", temp, humidity, current_time)
+        update_status("SAFE", temp_f, humidity, current_time)
 
     # DISPLAY
     annotated_frame = result.plot()
