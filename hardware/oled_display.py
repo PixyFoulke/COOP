@@ -3,7 +3,7 @@
 
 from PIL import Image, ImageDraw
 
-from hardware.oled_driver import _oled  # ONLY hardware driver
+from hardware.sensors import _oled  # ONLY hardware driver
 
 
 def update_status(status: str, temp: float, humidity: float, current_time: str):
