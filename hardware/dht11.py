@@ -5,6 +5,7 @@
 import time
 import adafruit_dht
 import board
+from hardware.oled_display import update_status   # <-- ADD THIS
 
 sensor = adafruit_dht.DHT11(board.D4)
 
@@ -16,9 +17,14 @@ try:
             temp_c = sensor.temperature
             temp_f = temp_c * 9 / 5 + 32
             humidity = sensor.humidity
-            print(f"Temp: {temp_c:.1f}C / {temp_f:.1f}F  |  Humidity: {humidity:.1f}%")
+
+            print(
+                f"Temp: {temp_c:.1f}C / {temp_f:.1f}F  |  Humidity: {humidity:.1f}%")
+
+            # SEND TO OLED
+            update_status(f"Temp: {temp_c:.1f}C\nHum: {humidity:.1f}%")
+
         except RuntimeError as e:
-            # DHT11 read failures are common/expected, just retry
             print(f"Read error: {e.args[0]}")
 
         time.sleep(2)
