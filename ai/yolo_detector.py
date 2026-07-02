@@ -8,6 +8,7 @@ from ai.classifier import classify
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "outsidecoop.pt")
+MODEL_PATH = os.path.abspath(MODEL_PATH)
 
 model = YOLO(MODEL_PATH)
 
