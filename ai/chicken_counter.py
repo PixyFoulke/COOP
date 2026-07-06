@@ -7,7 +7,7 @@ from picamera2 import Picamera2
 
 # MODEL PATH
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "chicken_counter.pt")
+MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "chicken.pt")
 MODEL_PATH = os.path.abspath(MODEL_PATH)
 
 model = YOLO(MODEL_PATH)
