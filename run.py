@@ -4,6 +4,7 @@
 import os
 import cv2
 import time
+import threading
 from picamera2 import Picamera2
 
 from ai.actions import trigger_alarm, safe_state, warning_state
@@ -11,9 +12,10 @@ from hardware.oled_display import update_status
 from hardware.email_alert import send_email_alert
 from hardware.sensors import getTemperature, getHumidity
 from ai.yolo_detector import process_frame
+from ai.chicken_counter import get_chicken_count
 
 
-# CAMERA SETUP
+# CAMERA 1 (OUTSIDE)
 picam2 = Picamera2()
 config = picam2.create_preview_configuration(
     main={"format": "RGB888", "size": (640, 480)}
@@ -21,22 +23,47 @@ config = picam2.create_preview_configuration(
 picam2.configure(config)
 picam2.start()
 
-print("COOP Safety System Running... Press 'q' to quit")
 
-
-# EMAIL COOLDOWN
+# SHARED DATA
 last_email_time = 0
 EMAIL_COOLDOWN = 180
 
+chicken_count = 0
+lock = threading.Lock()
 
-# MAIN LOOP
+
+# CHICKEN THREAD (CAMERA 2 INSIDE COOP)
+def chicken_loop():
+    global chicken_count
+
+    while True:
+        try:
+            count, _ = get_chicken_count()
+
+            with lock:
+                chicken_count = count
+
+        except:
+            continue
+
+        time.sleep(1)  # IMPORTANT: don't overload Pi
+
+
+# Start chicken thread
+threading.Thread(target=chicken_loop, daemon=True).start()
+
+
+print("COOP Safety System Running... Press 'q' to quit")
+
+
+# MAIN LOOP (THREAT DETECTION CAMERA)
 while True:
     frame = picam2.capture_array()
 
     # YOLO PROCESSING
     try:
         result, threats, unknowns = process_frame(frame)
-        annotated_frame = result.plot()   # <-- Moved here
+        annotated_frame = result.plot()
     except:
         continue
 
@@ -44,7 +71,6 @@ while True:
     temp = getTemperature()
     humidity = getHumidity()
 
-    # SAFE FALLBACKS + FAHRENHEIT CONVERSION
     if temp is None:
         temp_f = 0
     else:
@@ -55,10 +81,14 @@ while True:
 
     current_time = time.strftime("%H:%M:%S")
 
+    # GET CHICKEN COUNT SAFELY
+    with lock:
+        chickens = chicken_count
+
     # DECISION LOGIC
+
     if len(threats) > 0:
         trigger_alarm()
-
         update_status("THREAT", temp_f, humidity, current_time)
 
         if time.time() - last_email_time > EMAIL_COOLDOWN:
@@ -68,13 +98,14 @@ while True:
 
     elif len(unknowns) > 0:
         warning_state()
-
         update_status("UNKNOWN", temp_f, humidity, current_time)
+
+    elif chickens < 10:   # adjust expected chicken count later
+        update_status(f"MISSING ({chickens})", temp_f, humidity, current_time)
 
     else:
         safe_state()
-
-        update_status("SAFE", temp_f, humidity, current_time)
+        update_status(f"SAFE ({chickens})", temp_f, humidity, current_time)
 
     # DISPLAY
     cv2.imshow("COOP Safety System", annotated_frame)
