@@ -16,7 +16,7 @@ from ai.chicken_counter import get_chicken_count
 
 
 # CAMERA 1 (OUTSIDE)
-picam2 = Picamera2()
+picam2 = Picamera2(0)
 config = picam2.create_preview_configuration(
     main={"format": "RGB888", "size": (640, 480)}
 )
@@ -46,7 +46,7 @@ def chicken_loop():
         except:
             continue
 
-        time.sleep(1)  # IMPORTANT: don't overload Pi
+        time.sleep(1)
 
 
 # Start chicken thread
@@ -60,32 +60,27 @@ print("COOP Safety System Running... Press 'q' to quit")
 while True:
     frame = picam2.capture_array()
 
-    # YOLO PROCESSING
     try:
         result, threats, unknowns = process_frame(frame)
         annotated_frame = result.plot()
     except:
         continue
 
-    # SENSOR DATA
     temp = getTemperature()
     humidity = getHumidity()
 
     if temp is None:
         temp_f = 0
     else:
-        temp_f = (temp * 9/5) + 32
+        temp_f = (temp * 9 / 5) + 32
 
     if humidity is None:
         humidity = 0
 
     current_time = time.strftime("%H:%M:%S")
 
-    # GET CHICKEN COUNT SAFELY
     with lock:
         chickens = chicken_count
-
-    # DECISION LOGIC
 
     if len(threats) > 0:
         trigger_alarm()
@@ -100,22 +95,19 @@ while True:
         warning_state()
         update_status("UNKNOWN", temp_f, humidity, current_time)
 
-    elif chickens < 10:   # adjust expected chicken count later
+    elif chickens < 10:
         update_status(f"MISSING ({chickens})", temp_f, humidity, current_time)
 
     else:
         safe_state()
         update_status(f"SAFE ({chickens})", temp_f, humidity, current_time)
 
-    # DISPLAY
     cv2.imshow("COOP Safety System", annotated_frame)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
     time.sleep(0.01)
 
-
-# CLEAN EXIT
 cv2.destroyAllWindows()
 picam2.stop()

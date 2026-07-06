@@ -12,11 +12,13 @@ MODEL_PATH = os.path.abspath(MODEL_PATH)
 
 model = YOLO(MODEL_PATH)
 
-# CAMERA SETUP
-picam2 = Picamera2()
+# CAMERA SETUP (INSIDE COOP CAMERA)
+picam2 = Picamera2(1)
+
 config = picam2.create_preview_configuration(
     main={"format": "RGB888", "size": (640, 480)}
 )
+
 picam2.configure(config)
 picam2.start()
 
