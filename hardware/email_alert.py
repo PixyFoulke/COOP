@@ -9,7 +9,7 @@ sender = "coopdetection@gmail.com"
 app_password = "YOUR_APP_PASSWORD"
 
 
-def send_email_alert(recipient="joshua.deree@icloud.com"):
+def send_email_alert(image_path, recipient="joshua.deree@icloud.com"):
     msg = EmailMessage()
     msg["Subject"] = "Chicken Coop Alert"
     msg["From"] = sender
@@ -19,6 +19,15 @@ def send_email_alert(recipient="joshua.deree@icloud.com"):
         "Potential predator detected\n"
         f"Time: {time.strftime('%H:%M:%S')}"
     )
+
+    # Attach image
+    with open(image_path, "rb") as image:
+        msg.add_attachment(
+            image.read(),
+            maintype="image",
+            subtype="jpeg",
+            filename="threat.jpg"
+        )
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
         smtp.login(sender, app_password)

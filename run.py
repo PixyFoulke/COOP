@@ -36,6 +36,7 @@ while True:
     # YOLO PROCESSING
     try:
         result, threats, unknowns = process_frame(frame)
+        annotated_frame = result.plot()   # <-- Moved here
     except:
         continue
 
@@ -61,7 +62,8 @@ while True:
         update_status("THREAT", temp_f, humidity, current_time)
 
         if time.time() - last_email_time > EMAIL_COOLDOWN:
-            send_email_alert()
+            cv2.imwrite("threat.jpg", annotated_frame)
+            send_email_alert("threat.jpg")
             last_email_time = time.time()
 
     elif len(unknowns) > 0:
@@ -75,7 +77,6 @@ while True:
         update_status("SAFE", temp_f, humidity, current_time)
 
     # DISPLAY
-    annotated_frame = result.plot()
     cv2.imshow("COOP Safety System", annotated_frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
