@@ -1,9 +1,8 @@
 
-# code for processing the yolo detection results and labeling them
+# code for processing yolo detections and labeling them
 
 from ultralytics import YOLO
 import os
-
 from ai.classifier import classify
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -14,7 +13,7 @@ model = YOLO(MODEL_PATH)
 
 
 def process_frame(frame):
-    results = model(frame, verbose=False)
+    results = model(frame, verbose=False, imgsz=640)
     result = results[0]
 
     detections = result.boxes
@@ -22,16 +21,21 @@ def process_frame(frame):
     threats = []
     unknowns = []
 
-    if detections is not None:
-        for box in detections:
-            cls_id = int(box.cls[0])
-            label = model.names[cls_id]
+    if detections is None:
+        return result, threats, unknowns
 
-            status = classify(label)
+    for box in detections:
+        if box.cls is None:
+            continue
 
-            if status == "THREAT":
-                threats.append(label)
-            elif status == "UNKNOWN":
-                unknowns.append(label)
+        cls_id = int(box.cls[0])
+        label = model.names[cls_id]
+
+        status = classify(label)
+
+        if status == "THREAT":
+            threats.append(label)
+        elif status == "UNKNOWN":
+            unknowns.append(label)
 
     return result, threats, unknowns
