@@ -10,12 +10,15 @@ i2c = busio.I2C(board.SCL, board.SDA)
 # Create the ADC object using the default I2C address
 ads = ADS.ADS1115(i2c)
 
-# Create single-ended input on channel 0 (A0)
+# FIXED: Use a period instead of a comma, and reference the correct pin names
 pr1 = AnalogIn(ads, ADS.P0)
-pr2 = AnalogIn(ads, ADS,P1)
-print("{:>5}\t{:>5}".format('Raw', 'v'))
+pr2 = AnalogIn(ads, ADS.P1)
+
+# Cleaned up the header for two distinct sensors
+print("PR1 (Raw / V)\t\tPR2 (Raw / V)")
+print("-" * 38)
 
 while True:
-    print("{:>5}\t{:>5.3f}".format(pr1.value, pr1.voltage))
-    print("{:>5}\t{:>5.3f}".format(pr2.value, pr2.voltage))
+    # Print both sensors on the same line to keep the terminal easy to read
+    print(f"{pr1.value:>5} / {pr1.voltage:.3f}V\t{pr2.value:>5} / {pr2.voltage:.3f}V")
     time.sleep(1.0)
