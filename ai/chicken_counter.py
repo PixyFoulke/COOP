@@ -41,4 +41,6 @@ def get_chicken_count():
             if label.lower() == "chicken":
                 count += 1
 
-    return count, result
+    annotated_frame = result.plot()
+
+    return count, annotated_frame
