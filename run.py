@@ -155,20 +155,17 @@ while True:
         safe_state()
         update_status(status, temp_f, humidity, current_time, chickens)
 
-        # UPDATE API DATA
-        update_system_data(
-            status=status,
-            temperature=temp_f,
-            humidity=humidity,
-            chicken_count=chickens,
-            threats=threats,
-            unknowns=unknowns
-        )
+    # UPDATE API DATA (ALL STATUSES)
+    update_system_data(
+        status=status,
+        temperature=temp_f,
+        humidity=humidity,
+        chicken_count=chickens,
+        threats=threats,
+        unknowns=unknowns
+    )
 
-    # UPDATE LIVE VIDEO FRAME
-    update_frame(annotated_frame)
-
-    # DISPLAY BOTH CAMERAS
+    # CREATE COMBINED VIDEO FRAME
     if inside_display is not None:
 
         combined_frame = cv2.hconcat(
@@ -178,17 +175,17 @@ while True:
             ]
         )
 
-        cv2.imshow(
-            "COOP Safety System",
-            combined_frame
-        )
-
     else:
+        combined_frame = annotated_frame
 
-        cv2.imshow(
-            "COOP Safety System",
-            annotated_frame
-        )
+    # SEND VIDEO TO API
+    update_frame(combined_frame)
+
+    # DISPLAY BOTH CAMERAS LOCALLY
+    cv2.imshow(
+        "COOP Safety System",
+        combined_frame
+    )
 
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
