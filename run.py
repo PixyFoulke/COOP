@@ -14,6 +14,13 @@ from hardware.sensors import getTemperature, getHumidity
 from ai.yolo_detector import process_frame
 from ai.chicken_counter import get_chicken_count
 
+# NEW IMPORTS
+from network.api_server import (
+    update_system_data,
+    update_frame,
+    start_api
+)
+
 
 # CAMERA 1 (OUTSIDE)
 picam2 = Picamera2(0)
@@ -52,6 +59,12 @@ def chicken_loop():
 # Start chicken thread
 threading.Thread(target=chicken_loop, daemon=True).start()
 
+# START API SERVER
+threading.Thread(
+    target=start_api,
+    daemon=True
+).start()
+
 
 print("COOP Safety System Running... Press 'q' to quit")
 
@@ -82,25 +95,49 @@ while True:
     with lock:
         chickens = chicken_count
 
+    # DETERMINE SYSTEM STATUS
     if len(threats) > 0:
+        status = "THREAT"
+
+    elif len(unknowns) > 0:
+        status = "UNKNOWN"
+
+    elif chickens < 10:
+        status = f"MISSING ({chickens})"
+
+    else:
+        status = f"SAFE ({chickens})"
+
+    # RUN ACTIONS
+    if status == "THREAT":
         trigger_alarm()
-        update_status("THREAT", temp_f, humidity, current_time)
+        update_status(status, temp_f, humidity, current_time)
 
         if time.time() - last_email_time > EMAIL_COOLDOWN:
             cv2.imwrite("threat.jpg", annotated_frame)
             send_email_alert("threat.jpg")
             last_email_time = time.time()
 
-    elif len(unknowns) > 0:
+    elif status == "UNKNOWN":
         warning_state()
-        update_status("UNKNOWN", temp_f, humidity, current_time)
-
-    elif chickens < 10:
-        update_status(f"MISSING ({chickens})", temp_f, humidity, current_time)
+        update_status(status, temp_f, humidity, current_time)
 
     else:
         safe_state()
-        update_status(f"SAFE ({chickens})", temp_f, humidity, current_time)
+        update_status(status, temp_f, humidity, current_time)
+
+    # UPDATE API DATA
+    update_system_data(
+        status=status,
+        temperature=temp_f,
+        humidity=humidity,
+        chicken_count=chickens,
+        threats=threats,
+        unknowns=unknowns
+    )
+
+    # UPDATE LIVE VIDEO FRAME
+    update_frame(annotated_frame)
 
     cv2.imshow("COOP Safety System", annotated_frame)
 
