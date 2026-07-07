@@ -9,13 +9,13 @@ from picamera2 import Picamera2
 
 from ai.actions import trigger_alarm, safe_state, warning_state
 from hardware.oled_display import update_status
-from hardware.email_alert import send_email_alert
+from software.email_alert import send_email_alert
 from hardware.sensors import getTemperature, getHumidity
 from ai.yolo_detector import process_frame
 from ai.chicken_counter import get_chicken_count
 
 # NEW IMPORTS
-from network.api_server import (
+from software.api_client import (
     update_system_data,
     update_frame,
     start_api
