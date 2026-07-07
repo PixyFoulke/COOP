@@ -11,8 +11,8 @@ i2c = busio.I2C(board.SCL, board.SDA)
 ads = ADS.ADS1115(i2c)
 
 # FIXED: Use a period instead of a comma, and reference the correct pin names
-pr1 = AnalogIn(ads, ADS.A0)
-pr2 = AnalogIn(ads, ADS.A1)
+pr1 = AnalogIn(ads, ADS.P0)
+pr2 = AnalogIn(ads, ADS.P1)
 
 # Cleaned up the header for two distinct sensors
 print("PR1 (Raw / V)\t\tPR2 (Raw / V)")
