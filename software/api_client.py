@@ -1,9 +1,15 @@
 
 from flask import Flask, jsonify, Response
+from flask_cors import CORS
 import cv2
 import threading
 
+
 app = Flask(__name__)
+
+# ALLOW WEBSITE CONNECTIONS
+CORS(app)
+
 
 # SHARED SYSTEM STATE
 system_data = {
@@ -14,6 +20,7 @@ system_data = {
     "threats": [],
     "unknowns": []
 }
+
 
 # SHARED VIDEO FRAME
 output_frame = None
@@ -57,6 +64,7 @@ def generate_frames():
 
     while True:
         with lock:
+
             if output_frame is None:
                 continue
 
@@ -79,7 +87,7 @@ def generate_frames():
 def video_feed():
     return Response(
         generate_frames(),
-        mimetype='multipart/x-mixed-replace; boundary=frame'
+        mimetype="multipart/x-mixed-replace; boundary=frame"
     )
 
 
