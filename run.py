@@ -138,7 +138,7 @@ while True:
     if status == "THREAT":
 
         trigger_alarm()
-        update_status(status, temp_f, humidity, current_time)
+        update_status(status, temp_f, humidity, current_time, chickens)
 
         if time.time() - last_email_time > EMAIL_COOLDOWN:
             cv2.imwrite("threat.jpg", annotated_frame)
@@ -148,22 +148,22 @@ while True:
     elif status == "UNKNOWN":
 
         warning_state()
-        update_status(status, temp_f, humidity, current_time)
+        update_status(status, temp_f, humidity, current_time, chickens)
 
     else:
 
         safe_state()
-        update_status(status, temp_f, humidity, current_time)
+        update_status(status, temp_f, humidity, current_time, chickens)
 
-    # UPDATE API DATA
-    update_system_data(
-        status=status,
-        temperature=temp_f,
-        humidity=humidity,
-        chicken_count=chickens,
-        threats=threats,
-        unknowns=unknowns
-    )
+        # UPDATE API DATA
+        update_system_data(
+            status=status,
+            temperature=temp_f,
+            humidity=humidity,
+            chicken_count=chickens,
+            threats=threats,
+            unknowns=unknowns
+        )
 
     # UPDATE LIVE VIDEO FRAME
     update_frame(annotated_frame)

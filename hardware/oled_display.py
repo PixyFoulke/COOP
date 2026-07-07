@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw
 from hardware.sensors import _oled  # ONLY hardware driver
 
 
-def update_status(status: str, temp: float, humidity: float, current_time: str):
+def update_status(status: str, temp: float, humidity: float, current_time: str, chickens: int):
     image = Image.new("1", (128, 64))
     draw = ImageDraw.Draw(image)
 
@@ -22,10 +22,14 @@ def update_status(status: str, temp: float, humidity: float, current_time: str):
     temp_str = f"{temp:.1f}F" if temp is not None else "N/A"
     hum_str = f"{humidity:.0f}%" if humidity is not None else "N/A"
 
+    # Format chicken count
+    chicken_str = f"Chickens:{chickens}"
+
     # Draw OLED screen
     draw.text((0, 0), f"{coop}", fill=255)
     draw.text((0, 16), f"T:{temp_str} H:{hum_str}", fill=255)
     draw.text((0, 32), f"{current_time}", fill=255)
+    draw.text((0, 48), chicken_str, fill=255)
 
     # Push to OLED
     _oled.image(image)
