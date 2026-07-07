@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>COOP Safety Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+
+<h1>🐔 COOP Safety System</h1>
+
+
+<div class="container">
+
+
+    <!-- CAMERA -->
+    <div class="camera">
+
+        <h2>Live Camera Feed</h2>
+
+        <img 
+        src="http://192.168.50.2:5000/video_feed"
+        id="video">
+
+    </div>
+
+
+
+    <!-- DATA -->
+    <div class="data">
+
+
+        <div class="card">
+            <h3>Status</h3>
+            <p id="status">Loading...</p>
+        </div>
+
+
+        <div class="card">
+            <h3>Temperature</h3>
+            <p id="temperature">--</p>
+        </div>
+
+
+        <div class="card">
+            <h3>Humidity</h3>
+            <p id="humidity">--</p>
+        </div>
+
+
+        <div class="card">
+            <h3>Chicken Count</h3>
+            <p id="chickens">--</p>
+        </div>
+
+
+        <div class="card">
+            <h3>Threats</h3>
+            <p id="threats">None</p>
+        </div>
+
+
+        <div class="card">
+            <h3>Unknown Objects</h3>
+            <p id="unknowns">None</p>
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>

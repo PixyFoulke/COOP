@@ -1,0 +1,68 @@
+
+body {
+
+    font-family: Arial, sans-serif;
+    background:#202020;
+    color:white;
+    text-align:center;
+
+}
+
+
+h1 {
+
+    font-size:40px;
+
+}
+
+
+.container {
+
+    display:flex;
+    justify-content:center;
+    gap:40px;
+    margin-top:30px;
+
+}
+
+
+.camera img {
+
+    width:900px;
+    border-radius:15px;
+
+}
+
+
+.data {
+
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+
+}
+
+
+.card {
+
+    background:#333;
+    padding:15px;
+    width:250px;
+    border-radius:15px;
+
+}
+
+
+.card h3 {
+
+    margin:5px;
+
+}
+
+
+.card p {
+
+    font-size:25px;
+    margin:5px;
+
+}
