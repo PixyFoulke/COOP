@@ -160,8 +160,20 @@ while True:
         )
 
         if time.time() - last_email_time > EMAIL_COOLDOWN:
-            cv2.imwrite("threat.jpg", annotated_frame)
-            send_email_alert("threat.jpg")
+
+            cv2.imwrite(
+                "threat.jpg",
+                annotated_frame
+            )
+
+            settings = get_settings()
+            alert_email = settings["email"]
+
+            send_email_alert(
+                "threat.jpg",
+                alert_email
+            )
+
             last_email_time = time.time()
 
     elif status == "UNKNOWN":
