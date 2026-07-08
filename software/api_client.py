@@ -34,7 +34,8 @@ def update_system_data(
     humidity,
     chicken_count,
     threats,
-    unknowns
+    unknowns,
+    light_state
 ):
     system_data["status"] = status
     system_data["temperature"] = round(temperature, 1)
@@ -42,6 +43,7 @@ def update_system_data(
     system_data["chicken_count"] = chicken_count
     system_data["threats"] = threats
     system_data["unknowns"] = unknowns
+    system_data["light_state"] = light_state
 
 
 # UPDATE VIDEO FRAME

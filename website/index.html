@@ -5,73 +5,82 @@
 <head>
     <meta charset="UTF-8">
     <title>COOP Safety Dashboard</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 
 <body>
 
-<h1>🐔 COOP Safety System</h1>
+<header>
+    <h1>🐔 COOP Safety System</h1>
+    <p>Smart Chicken Coop Monitoring Dashboard</p>
+</header>
 
 
-<div class="container">
+<div class="dashboard">
 
 
-    <!-- CAMERA -->
-    <div class="camera">
-
-        <h2>Live Camera Feed</h2>
-
-        <img 
-        src="http://192.168.50.2:5000/video_feed"
-        id="video">
-
+    <!-- STATUS -->
+    <div class="card status-card">
+        <h3>System Status</h3>
+        <p id="status" class="value">Loading...</p>
     </div>
 
 
-
-    <!-- DATA -->
-    <div class="data">
-
-
-        <div class="card">
-            <h3>Status</h3>
-            <p id="status">Loading...</p>
-        </div>
-
-
-        <div class="card">
-            <h3>Temperature</h3>
-            <p id="temperature">-- °F</p>
-        </div>
-
-
-        <div class="card">
-            <h3>Humidity</h3>
-            <p id="humidity">-- %</p>
-        </div>
-
-
-        <div class="card">
-            <h3>Chicken Count</h3>
-            <p id="chickens">--</p>
-        </div>
-
-
-        <div class="card">
-            <h3>Threats</h3>
-            <p id="threats">None</p>
-        </div>
-
-
-        <div class="card">
-            <h3>Unknown Objects</h3>
-            <p id="unknowns">None</p>
-        </div>
-
-
+    <!-- LIGHT -->
+    <div class="card">
+        <h3>Lighting</h3>
+        <p id="light" class="value">--</p>
     </div>
 
+
+    <!-- TEMPERATURE -->
+    <div class="card">
+        <h3>🌡 Temperature</h3>
+        <p id="temperature" class="value">-- °F</p>
+    </div>
+
+
+    <!-- HUMIDITY -->
+    <div class="card">
+        <h3>💧 Humidity</h3>
+        <p id="humidity" class="value">-- %</p>
+    </div>
+
+
+    <!-- CHICKENS -->
+    <div class="card">
+        <h3>🐔 Chickens</h3>
+        <p id="chickens" class="value">--</p>
+    </div>
+
+
+    <!-- THREATS -->
+    <div class="card">
+        <h3>🚨 Threats</h3>
+        <p id="threats">None</p>
+    </div>
+
+
+    <!-- UNKNOWN -->
+    <div class="card">
+        <h3>❓ Unknown Objects</h3>
+        <p id="unknowns">None</p>
+    </div>
+
+
+</div>
+
+
+<!-- CAMERA -->
+<div class="camera-section">
+
+    <h2>📷 Live Camera Feed</h2>
+
+    <img 
+    src="http://192.168.50.2:5000/video_feed"
+    id="video">
 
 </div>
 

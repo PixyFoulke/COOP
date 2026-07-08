@@ -2,75 +2,118 @@
 const API = "http://192.168.50.2:5000/status";
 
 
-function updateData() {
-
-    fetch(API)
-
-    .then(response => response.json())
-
-    .then(data => {
+function updateData(){
 
 
-        document.getElementById("status").innerHTML =
-        data.status;
+fetch(API)
+
+.then(response => response.json())
 
 
-        document.getElementById("temperature").innerHTML =
-        data.temperature + " &deg;F";
+.then(data => {
 
 
-        document.getElementById("humidity").innerHTML =
-        data.humidity + " %";
+    let status =
+    document.getElementById("status");
 
 
-        document.getElementById("chickens").innerHTML =
-        data.chicken_count;
+    status.innerHTML =
+    data.status;
 
 
 
-        if (data.threats.length > 0) {
+    // STATUS COLORS
 
-            document.getElementById("threats").innerHTML =
-            data.threats.join(", ");
-
-        } 
-        
-        else {
-
-            document.getElementById("threats").innerHTML =
-            "None";
-
-        }
+    status.className="value";
 
 
+    if(data.status.includes("SAFE")){
 
-        if (data.unknowns.length > 0) {
+        status.classList.add("safe");
 
-            document.getElementById("unknowns").innerHTML =
-            data.unknowns.join(", ");
+    }
 
-        } 
-        
-        else {
+    else if(data.status.includes("THREAT")){
 
-            document.getElementById("unknowns").innerHTML =
-            "None";
+        status.classList.add("danger");
 
-        }
+    }
+
+    else{
+
+        status.classList.add("warning");
+
+    }
 
 
-    })
 
-    .catch(error => {
+    document.getElementById("temperature").innerHTML =
+    data.temperature + " °F";
 
-        console.log(error);
 
-    });
+    document.getElementById("humidity").innerHTML =
+    data.humidity + " % Humidity";
+
+
+    document.getElementById("chickens").innerHTML =
+    data.chicken_count;
+
+
+
+    if(data.light_state){
+
+        document.getElementById("light").innerHTML =
+        data.light_state;
+
+    }
+
+
+
+    if(data.threats.length > 0){
+
+        document.getElementById("threats").innerHTML =
+        data.threats.join(", ");
+
+    }
+
+    else{
+
+        document.getElementById("threats").innerHTML =
+        "None";
+
+    }
+
+
+
+    if(data.unknowns.length > 0){
+
+        document.getElementById("unknowns").innerHTML =
+        data.unknowns.join(", ");
+
+    }
+
+    else{
+
+        document.getElementById("unknowns").innerHTML =
+        "None";
+
+    }
+
+
+})
+
+
+.catch(error => {
+
+    console.log(error);
+
+});
+
 
 }
 
 
 
-setInterval(updateData, 1000);
+setInterval(updateData,1000);
 
 updateData();
