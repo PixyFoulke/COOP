@@ -13,7 +13,7 @@ model = YOLO(MODEL_PATH)
 
 
 def process_frame(frame):
-    results = model(frame, verbose=False, imgsz=640)
+    results = model(frame, verbose=False, imgsz=640, conf=0.5)
     result = results[0]
 
     detections = result.boxes

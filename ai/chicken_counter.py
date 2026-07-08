@@ -26,7 +26,7 @@ picam2.start()
 def get_chicken_count():
     frame = picam2.capture_array()
 
-    results = model(frame, verbose=False)
+    results = model(frame, verbose=False, conf=0.5)
     result = results[0]
 
     boxes = result.boxes
