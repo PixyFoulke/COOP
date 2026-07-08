@@ -3,10 +3,15 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <title>COOP Safety Dashboard</title>
 
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+
+<title>
+COOP Safety Dashboard
+</title>
+
+<link rel="stylesheet" href="css/style.css">
+
 </head>
 
 
@@ -15,88 +20,153 @@
 
 <header>
 
-    <h1>🐔 COOP Safety System</h1>
+<h1>
+🐔 COOP Safety System
+</h1>
 
-    <p>Chicken Optics for Overall Protection</p>
+<p>
+Chicken Optics for Overall Protection
+</p>
 
-    <a href="settings.html" class="nav-button">
-        ⚙ Settings
-    </a>
+
+<nav class="navbar">
+
+<a href="index.html">
+🏠 Home
+</a>
+
+<a href="video.html">
+📷 Live Video
+</a>
+
+<a href="door.html">
+🚪 Door
+</a>
+
+<a href="settings.html">
+⚙ Settings
+</a>
+
+</nav>
+
 
 </header>
+
 
 
 
 <div class="dashboard">
 
 
-    <!-- STATUS -->
-    <div class="card status-card">
-        <h3>System Status</h3>
-        <p id="status" class="value">Loading...</p>
-    </div>
+<div class="card status-card">
+
+<h3>
+System Status
+</h3>
+
+<p id="status" class="value">
+Loading...
+</p>
+
+</div>
 
 
-    <!-- LIGHT -->
-    <div class="card">
-        <h3>Lighting</h3>
-        <p id="light" class="value">--</p>
-    </div>
 
 
-    <!-- TEMPERATURE -->
-    <div class="card">
-        <h3>🌡 Temperature</h3>
-        <p id="temperature" class="value">-- °F</p>
-    </div>
+<div class="card">
+
+<h3>
+💡 Lighting
+</h3>
+
+<p id="light" class="value">
+--
+</p>
+
+</div>
 
 
-    <!-- HUMIDITY -->
-    <div class="card">
-        <h3>💧 Humidity</h3>
-        <p id="humidity" class="value">-- %</p>
-    </div>
 
 
-    <!-- CHICKENS -->
-    <div class="card">
-        <h3>🐔 Chickens</h3>
-        <p id="chickens" class="value">--</p>
-    </div>
+<div class="card">
+
+<h3>
+🌡 Temperature
+</h3>
+
+<p id="temperature" class="value">
+--
+</p>
+
+</div>
 
 
-    <!-- THREATS -->
-    <div class="card">
-        <h3>🚨 Threats</h3>
-        <p id="threats">None</p>
-    </div>
 
 
-    <!-- UNKNOWN -->
-    <div class="card">
-        <h3>❓ Unknown Objects</h3>
-        <p id="unknowns">None</p>
-    </div>
+<div class="card">
+
+<h3>
+💧 Humidity
+</h3>
+
+<p id="humidity" class="value">
+--
+</p>
+
+</div>
+
+
+
+
+<div class="card">
+
+<h3>
+🐔 Chickens
+</h3>
+
+<p id="chickens" class="value">
+--
+</p>
+
+</div>
+
+
+
+
+<div class="card">
+
+<h3>
+🚨 Threats
+</h3>
+
+<p id="threats">
+None
+</p>
+
+</div>
+
+
+
+
+<div class="card">
+
+<h3>
+❓ Unknown Objects
+</h3>
+
+<p id="unknowns">
+None
+</p>
+
+</div>
+
 
 
 </div>
 
 
 
-<!-- CAMERA -->
-<div class="camera-section">
-
-    <h2>📷 Live Camera Feed</h2>
-
-    <img 
-    src="http://192.168.50.2:5000/video_feed"
-    id="video">
-
-</div>
-
-
-
-<script src="script.js"></script>
+<script src="js/dashboard.js"></script>
 
 
 </body>
