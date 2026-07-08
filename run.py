@@ -14,6 +14,7 @@ from hardware.sensors import getTemperature, getHumidity
 from hardware.ads import get_light_state
 from ai.yolo_detector import process_frame
 from ai.chicken_counter import get_chicken_count
+from config.settings import get_settings
 
 from software.api_client import (
     update_system_data,
@@ -41,6 +42,13 @@ chicken_count = 0
 inside_frame = None
 
 lock = threading.Lock()
+
+
+# USER SETTINGS
+settings = get_settings()
+
+expected_chickens = settings["chicken_count"]
+alert_email = settings["email"]
 
 
 # CHICKEN THREAD (CAMERA 2 INSIDE COOP)
@@ -132,8 +140,8 @@ while True:
     elif len(unknowns) > 0:
         status = "UNKNOWN"
 
-    elif chickens < 10:
-        status = f"MISSING ({chickens})"
+    elif chickens < expected_chickens:
+        status = f"MISSING ({chickens}/{expected_chickens})"
 
     else:
         status = f"SAFE ({chickens})"
