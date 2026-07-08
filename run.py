@@ -11,6 +11,7 @@ from ai.actions import trigger_alarm, safe_state, warning_state
 from hardware.oled_display import update_status
 from software.email_alert import send_email_alert
 from hardware.sensors import getTemperature, getHumidity
+from hardware.ads import get_light_state
 from ai.yolo_detector import process_frame
 from ai.chicken_counter import get_chicken_count
 
@@ -99,6 +100,9 @@ while True:
     if humidity is None:
         humidity = 0
 
+    # DAY / NIGHT STATE
+    light_state = get_light_state()
+
     current_time = time.strftime("%H:%M:%S")
 
     # GET INSIDE CAMERA DATA
@@ -138,7 +142,14 @@ while True:
     if status == "THREAT":
 
         trigger_alarm()
-        update_status(status, temp_f, humidity, current_time, chickens)
+        update_status(
+            status,
+            temp_f,
+            humidity,
+            current_time,
+            chickens,
+            light_state
+        )
 
         if time.time() - last_email_time > EMAIL_COOLDOWN:
             cv2.imwrite("threat.jpg", annotated_frame)
@@ -148,12 +159,26 @@ while True:
     elif status == "UNKNOWN":
 
         warning_state()
-        update_status(status, temp_f, humidity, current_time, chickens)
+        update_status(
+            status,
+            temp_f,
+            humidity,
+            current_time,
+            chickens,
+            light_state
+        )
 
     else:
 
         safe_state()
-        update_status(status, temp_f, humidity, current_time, chickens)
+        update_status(
+            status,
+            temp_f,
+            humidity,
+            current_time,
+            chickens,
+            light_state
+        )
 
     # UPDATE API DATA (ALL STATUSES)
     update_system_data(

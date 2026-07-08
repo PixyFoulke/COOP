@@ -2,8 +2,7 @@
 const API = "http://192.168.50.2:5000/status";
 
 
-function updateData(){
-
+function updateData() {
 
     fetch(API)
 
@@ -17,7 +16,7 @@ function updateData(){
 
 
         document.getElementById("temperature").innerHTML =
-        data.temperature + " °F";
+        data.temperature + " &deg;F";
 
 
         document.getElementById("humidity").innerHTML =
@@ -29,13 +28,13 @@ function updateData(){
 
 
 
-        if(data.threats.length > 0){
+        if (data.threats.length > 0) {
 
             document.getElementById("threats").innerHTML =
             data.threats.join(", ");
 
-        }
-
+        } 
+        
         else {
 
             document.getElementById("threats").innerHTML =
@@ -45,20 +44,19 @@ function updateData(){
 
 
 
-        if(data.unknowns.length > 0){
+        if (data.unknowns.length > 0) {
 
             document.getElementById("unknowns").innerHTML =
             data.unknowns.join(", ");
 
-        }
-
+        } 
+        
         else {
 
             document.getElementById("unknowns").innerHTML =
             "None";
 
         }
-
 
 
     })
@@ -69,11 +67,10 @@ function updateData(){
 
     });
 
-
 }
 
 
 
-setInterval(updateData,1000);
+setInterval(updateData, 1000);
 
 updateData();
