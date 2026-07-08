@@ -187,7 +187,7 @@ while True:
         humidity=humidity,
         chicken_count=chickens,
         threats=threats,
-        unknowns=unknowns
+        unknowns=unknowns,
         light_state=light_state
     )
 
