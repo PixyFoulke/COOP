@@ -169,3 +169,38 @@ header p {
     0 10px 30px black;
 
 }
+
+header {
+
+    margin-bottom: 30px;
+
+}
+
+
+.nav-button {
+
+    display: inline-block;
+    margin-top: 10px;
+
+    padding: 12px 25px;
+
+    background: #4CAF50;
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 10px;
+
+    font-size: 18px;
+
+    transition: 0.3s;
+
+}
+
+
+.nav-button:hover {
+
+    background: #45a049;
+
+}

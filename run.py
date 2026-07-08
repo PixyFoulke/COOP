@@ -45,10 +45,11 @@ lock = threading.Lock()
 
 
 # USER SETTINGS
-settings = get_settings()
+expected_chickens = 0
+alert_email = ""
 
-expected_chickens = settings["chicken_count"]
-alert_email = settings["email"]
+last_settings_update = 0
+SETTINGS_REFRESH = 5
 
 
 # CHICKEN THREAD (CAMERA 2 INSIDE COOP)
@@ -86,6 +87,16 @@ print("COOP Safety System Running... Press 'q' to quit")
 
 # MAIN LOOP (OUTSIDE THREAT DETECTION CAMERA)
 while True:
+
+    # UPDATE USER SETTINGS EVERY 5 SECONDS
+    if time.time() - last_settings_update > SETTINGS_REFRESH:
+
+        settings = get_settings()
+
+        expected_chickens = settings["chicken_count"]
+        alert_email = settings["email"]
+
+        last_settings_update = time.time()
 
     # OUTSIDE CAMERA
     frame = picam2.capture_array()
@@ -135,21 +146,26 @@ while True:
 
     # DETERMINE SYSTEM STATUS
     if len(threats) > 0:
+
         status = "THREAT"
 
     elif len(unknowns) > 0:
+
         status = "UNKNOWN"
 
     elif chickens < expected_chickens:
+
         status = f"MISSING ({chickens}/{expected_chickens})"
 
     else:
+
         status = f"SAFE ({chickens})"
 
     # RUN ACTIONS
     if status == "THREAT":
 
         trigger_alarm()
+
         update_status(
             status,
             temp_f,
@@ -166,9 +182,6 @@ while True:
                 annotated_frame
             )
 
-            settings = get_settings()
-            alert_email = settings["email"]
-
             send_email_alert(
                 "threat.jpg",
                 alert_email
@@ -179,6 +192,7 @@ while True:
     elif status == "UNKNOWN":
 
         warning_state()
+
         update_status(
             status,
             temp_f,
@@ -191,6 +205,7 @@ while True:
     else:
 
         safe_state()
+
         update_status(
             status,
             temp_f,
@@ -200,7 +215,7 @@ while True:
             light_state
         )
 
-    # UPDATE API DATA (ALL STATUSES)
+    # UPDATE API DATA
     update_system_data(
         status=status,
         temperature=temp_f,
@@ -222,6 +237,7 @@ while True:
         )
 
     else:
+
         combined_frame = annotated_frame
 
     # SEND VIDEO TO API
