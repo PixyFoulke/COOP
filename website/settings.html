@@ -3,72 +3,135 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <title>COOP Settings</title>
 
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+
+    <title>
+        COOP Settings
+    </title>
+
+    <link rel="stylesheet" href="css/style.css">
+
 </head>
+
 
 
 <body>
 
 
+
 <header>
 
-    <h1>🐔 COOP Settings</h1>
+    <h1>
+        🐔 COOP Settings
+    </h1>
 
-    <a href="index.html" class="nav-button">
-        🏠 Home
-    </a>
+    <p>
+        System Configuration
+    </p>
+
+
+    <nav class="navbar">
+
+        <a href="index.html">
+            🏠 Home
+        </a>
+
+
+        <a href="video.html">
+            📷 Live Video
+        </a>
+
+
+        <a href="door.html">
+            🚪 Door
+        </a>
+
+
+        <a href="settings.html">
+            ⚙ Settings
+        </a>
+
+    </nav>
+
 
 </header>
+
 
 
 
 <div class="dashboard">
 
 
-<div class="card">
 
-<h3>Number of Chickens</h3>
+    <!-- CHICKEN COUNT -->
 
-<input 
-id="chicken_count"
-type="number"
-placeholder="Enter number">
+    <div class="card">
+
+        <h3>
+            🐔 Number of Chickens
+        </h3>
+
+
+        <input
+        id="chicken_count"
+        type="number"
+        placeholder="Enter number">
+
+
+    </div>
+
+
+
+
+
+    <!-- EMAIL ALERTS -->
+
+    <div class="card">
+
+        <h3>
+            📧 Email Alerts
+        </h3>
+
+
+        <input
+        id="email"
+        type="email"
+        placeholder="Enter email">
+
+
+    </div>
+
+
+
+
+
+    <!-- SAVE -->
+
+    <div class="card">
+
+        <h3>
+            Save Configuration
+        </h3>
+
+
+        <button onclick="saveSettings()">
+
+            Save Settings
+
+        </button>
+
+
+    </div>
+
 
 
 </div>
 
 
 
-<div class="card">
 
-<h3>Email Alerts</h3>
-
-<input 
-id="email"
-type="email"
-placeholder="Enter email">
-
-
-</div>
-
-
-
-<div class="card">
-
-<button onclick="saveSettings()">
-Save Settings
-</button>
-
-</div>
-
-
-</div>
-
-
-<script src="settings.js"></script>
+<script src="js/settings.js"></script>
 
 
 </body>
