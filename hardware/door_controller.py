@@ -1,34 +1,33 @@
-# Jax
 import time
 import board
 import digitalio
 
-dooropen = digitalio.DigitalInOut(board.D27)
-doorclose = digitalio.DigitalInOut(board.D17)
+door_open_pin = digitalio.DigitalInOut(board.D27)
+door_close_pin = digitalio.DigitalInOut(board.D17)
 
-dooropen.direction = digitalio.Direction.INPUT
-doorclose.direction = digitalio.Direction.INPUT
+door_open_pin.direction = digitalio.Direction.OUTPUT
+door_close_pin.direction = digitalio.Direction.OUTPUT
 
-def dooropen():
-    dooropen.pull = digitalio.Pull.DOWN
-    time.sleep(0.1)
-    dooropen.pull = digitalio.Pull.UP
+def door_open():
+    door_open_pin.value = True
     time.sleep(1)
-    dooropen.pull = digitalio.Pull.DOWN
-    time.sleep(0.1)
-    dooropen.pull = digitalio.Pull.UP
-
-def doorclose():
-    doorclose.pull = digitalio.Pull.DOWN
-    time.sleep(0.1)
-    doorclose.pull = digitalio.Pull.UP
+    door_open_pin.value = False
     time.sleep(1)
-    doorclose.pull = digitalio.Pull.DOWN
-    time.sleep(0.1)
-    doorclose.pull = digitalio.Pull.UP
+    door_open_pin.value = True
+    time.sleep(1)
+    door_open_pin.value = False
+    time.sleep(1)
+
+def door_close():
+    door_close_pin.value = True
+    time.sleep(1)
+    door_close_pin.value = False
+    time.sleep(1)
+    door_close_pin.value = True
+    time.sleep(1)
+    door_close_pin.value = False
+    time.sleep(1)
 
 # TEST
-dooropen()
-time.sleep(2)
-doorclose()
+door_open()
 time.sleep(2)
