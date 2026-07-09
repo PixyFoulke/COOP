@@ -167,11 +167,15 @@ while True:
 
         door_open()
 
+        time.sleep(3)
+
     elif website_command == "close":
 
         print("Website closing door")
 
         door_close()
+
+        time.sleep(3)
 
     # GET INSIDE CAMERA DATA
     with lock:
