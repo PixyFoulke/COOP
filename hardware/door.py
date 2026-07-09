@@ -17,6 +17,11 @@ door_open_pin.value = False
 door_close_pin.value = False
 
 
+# Software tracking of last command
+# (Pi does not have actual door position feedback yet)
+door_state = "closed"
+
+
 def door_open():
 
     print("OPEN signal")
@@ -57,6 +62,19 @@ def door_close():
 
 def toggle_door():
 
-    # temporary toggle behavior
-    # controller itself handles stopping at limits
-    door_open()
+    global door_state
+
+    if door_state == "closed":
+
+        door_open()
+        door_state = "open"
+
+    else:
+
+        door_close()
+        door_state = "closed"
+
+
+def is_door_open():
+
+    return door_state == "open"
