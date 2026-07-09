@@ -12,6 +12,14 @@ from hardware.oled_display import update_status
 from software.email_alert import send_email_alert
 from hardware.sensors import getTemperature, getHumidity
 from hardware.ads import get_light_state
+from hardware.button_controller import (
+    get_button_action,
+    reboot_pi
+)
+from hardware.door import (
+    toggle_door,
+    is_door_open
+)
 from ai.yolo_detector import process_frame
 from ai.chicken_counter import get_chicken_count
 from config.settings import get_settings
@@ -123,6 +131,31 @@ while True:
     light_state = get_light_state()
 
     current_time = time.strftime("%H:%M:%S")
+
+    # BUTTON CONTROLS
+    action = get_button_action()
+
+    if action == "toggle":
+
+        door_state = toggle_door()
+
+        if door_state:
+            print("Door opened from button.")
+        else:
+            print("Door closed from button.")
+
+    elif action == "alarm":
+
+        print("Manual alarm test.")
+
+        trigger_alarm()
+        time.sleep(3)
+        safe_state()
+
+    elif action == "restart":
+
+        print("Restarting Raspberry Pi...")
+        reboot_pi()
 
     # GET INSIDE CAMERA DATA
     with lock:
