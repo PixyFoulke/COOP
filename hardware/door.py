@@ -6,7 +6,7 @@ import digitalio
 
 # GPIO PINS
 door_open_pin = digitalio.DigitalInOut(board.D27)
-door_close_pin = digitalio.DigitalInOut(board.D22)
+door_close_pin = digitalio.DigitalInOut(board.D17)
 
 
 door_open_pin.direction = digitalio.Direction.OUTPUT
