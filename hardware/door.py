@@ -53,3 +53,10 @@ def door_close():
     time.sleep(1)
 
     print("CLOSE complete")
+
+
+def toggle_door():
+
+    # temporary toggle behavior
+    # controller itself handles stopping at limits
+    door_open()

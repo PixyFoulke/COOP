@@ -18,7 +18,6 @@ from hardware.button import (
 )
 from hardware.door import (
     toggle_door,
-    is_door_open
 )
 from ai.yolo_detector import process_frame
 from ai.chicken_counter import get_chicken_count
@@ -133,20 +132,18 @@ while True:
     current_time = time.strftime("%H:%M:%S")
 
     # BUTTON CONTROLS
+    # BUTTON CONTROLS
     action = get_button_action()
 
     if action == "toggle":
 
-        door_state = toggle_door()
+        print("Door button pressed")
 
-        if door_state:
-            print("Door opened from button.")
-        else:
-            print("Door closed from button.")
+        toggle_door()
 
     elif action == "alarm":
 
-        print("Manual alarm test.")
+        print("Manual alarm test")
 
         trigger_alarm()
         time.sleep(3)
@@ -154,7 +151,8 @@ while True:
 
     elif action == "restart":
 
-        print("Restarting Raspberry Pi...")
+        print("Restarting Raspberry Pi")
+
         reboot_pi()
 
     # GET INSIDE CAMERA DATA
