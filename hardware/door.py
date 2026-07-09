@@ -4,74 +4,60 @@ import board
 import digitalio
 
 
-# Door controller connections
-# OPEN wire -> GPIO 27
-# CLOSE wire -> GPIO 22
-# Door controller ground -> Raspberry Pi GND
-
+# Door controller inputs
 OPEN_PIN = board.D27
 CLOSE_PIN = board.D22
 
 
-open_button = digitalio.DigitalInOut(OPEN_PIN)
-close_button = digitalio.DigitalInOut(CLOSE_PIN)
+open_signal = digitalio.DigitalInOut(OPEN_PIN)
+close_signal = digitalio.DigitalInOut(CLOSE_PIN)
 
 
-# Start as outputs
-open_button.direction = digitalio.Direction.OUTPUT
-close_button.direction = digitalio.Direction.OUTPUT
-
-
-# Idle state (not pressing buttons)
-open_button.value = True
-close_button.value = True
-
-
-door_is_open = False
-
-
-def press_button(pin):
-    """
-    Simulates pressing the coop door button.
-    """
-
-    pin.value = False      # press
-    time.sleep(0.25)
-
-    pin.value = True       # release
-    time.sleep(0.25)
+open_signal.direction = digitalio.Direction.INPUT
+close_signal.direction = digitalio.Direction.INPUT
 
 
 def open_door():
-    global door_is_open
 
-    print("Opening door...")
+    print("Sending OPEN signal")
 
-    press_button(open_button)
+    open_signal.pull = digitalio.Pull.DOWN
+    time.sleep(0.1)
 
-    door_is_open = True
+    open_signal.pull = digitalio.Pull.UP
+    time.sleep(1)
+
+    open_signal.pull = digitalio.Pull.DOWN
+    time.sleep(0.1)
+
+    open_signal.pull = digitalio.Pull.UP
+
+    print("OPEN signal complete")
 
 
 def close_door():
-    global door_is_open
 
-    print("Closing door...")
+    print("Sending CLOSE signal")
 
-    press_button(close_button)
+    close_signal.pull = digitalio.Pull.DOWN
+    time.sleep(0.1)
 
-    door_is_open = False
+    close_signal.pull = digitalio.Pull.UP
+    time.sleep(1)
+
+    close_signal.pull = digitalio.Pull.DOWN
+    time.sleep(0.1)
+
+    close_signal.pull = digitalio.Pull.UP
+
+    print("CLOSE signal complete")
 
 
 def toggle_door():
-    global door_is_open
 
-    if door_is_open:
-        close_door()
-    else:
-        open_door()
-
-    return door_is_open
+    open_door()
 
 
 def is_door_open():
-    return door_is_open
+
+    return False
