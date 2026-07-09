@@ -31,16 +31,8 @@ def open_door():
     print("Opening door...")
 
     door_open_pin.value = True
-    time.sleep(1)
-
+    time.sleep(0.2)
     door_open_pin.value = False
-    time.sleep(1)
-
-    door_open_pin.value = True
-    time.sleep(1)
-
-    door_open_pin.value = False
-    time.sleep(1)
 
     door_state = True
 
@@ -54,16 +46,8 @@ def close_door():
     print("Closing door...")
 
     door_close_pin.value = True
-    time.sleep(1)
-
+    time.sleep(0.2)
     door_close_pin.value = False
-    time.sleep(1)
-
-    door_close_pin.value = True
-    time.sleep(1)
-
-    door_close_pin.value = False
-    time.sleep(1)
 
     door_state = False
 
