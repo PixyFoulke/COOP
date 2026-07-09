@@ -137,8 +137,6 @@ while True:
 
     if action == "toggle":
 
-        print("BUTTON PRESSED")
-
         door_state = toggle_door()
 
         if door_state:
