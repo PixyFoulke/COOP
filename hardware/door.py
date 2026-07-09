@@ -71,7 +71,7 @@ def toggle_door():
         door_open()
 
         print("Waiting for door movement to finish...")
-        time.sleep(15)
+        time.sleep(1)
 
         door_state = "open"
 
@@ -80,7 +80,7 @@ def toggle_door():
         door_close()
 
         print("Waiting for door movement to finish...")
-        time.sleep(15)
+        time.sleep(1)
 
         door_state = "closed"
 

@@ -25,6 +25,52 @@ system_data = {
 }
 
 
+# DOOR COMMAND
+door_command = None
+
+
+# OPEN DOOR COMMAND
+@app.route("/door/open", methods=["POST"])
+def open_door_command():
+
+    global door_command
+
+    door_command = "open"
+
+    return jsonify(
+        {
+            "message": "Open command sent"
+        }
+    )
+
+
+# CLOSE DOOR COMMAND
+@app.route("/door/close", methods=["POST"])
+def close_door_command():
+
+    global door_command
+
+    door_command = "close"
+
+    return jsonify(
+        {
+            "message": "Close command sent"
+        }
+    )
+
+
+# GET DOOR COMMAND
+def get_door_command():
+
+    global door_command
+
+    command = door_command
+
+    door_command = None
+
+    return command
+
+
 # SHARED VIDEO FRAME
 output_frame = None
 lock = threading.Lock()

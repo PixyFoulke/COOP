@@ -18,6 +18,8 @@ from hardware.button import (
 )
 from hardware.door import (
     toggle_door,
+    door_open,
+    door_close
 )
 from ai.yolo_detector import process_frame
 from ai.chicken_counter import get_chicken_count
@@ -26,7 +28,8 @@ from config.settings import get_settings
 from software.api_client import (
     update_system_data,
     update_frame,
-    start_api
+    start_api,
+    get_door_command
 )
 
 
@@ -132,7 +135,6 @@ while True:
     current_time = time.strftime("%H:%M:%S")
 
     # BUTTON CONTROLS
-    # BUTTON CONTROLS
     action = get_button_action()
 
     if action == "toggle":
@@ -154,6 +156,22 @@ while True:
         print("Restarting Raspberry Pi")
 
         reboot_pi()
+
+        # WEBSITE DOOR CONTROLS
+
+    website_command = get_door_command()
+
+    if website_command == "open":
+
+        print("Website opening door")
+
+        door_open()
+
+    elif website_command == "close":
+
+        print("Website closing door")
+
+        door_close()
 
     # GET INSIDE CAMERA DATA
     with lock:
