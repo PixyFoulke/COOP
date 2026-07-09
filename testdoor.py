@@ -1,12 +1,14 @@
 
-from hardware.door import open_door, close_door
+from hardware.door import door_open, door_close
 import time
 
 
-print("Testing open")
-open_door()
+print("Testing OPEN")
+door_open()
 
-time.sleep(5)
+time.sleep(10)
 
-print("Testing close")
-close_door()
+print("Testing CLOSE")
+door_close()
+
+print("Finished")

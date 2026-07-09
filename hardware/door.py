@@ -7,25 +7,49 @@ import digitalio
 door_open_pin = digitalio.DigitalInOut(board.D27)
 door_close_pin = digitalio.DigitalInOut(board.D22)
 
+
 door_open_pin.direction = digitalio.Direction.OUTPUT
 door_close_pin.direction = digitalio.Direction.OUTPUT
 
 
+# idle state
 door_open_pin.value = False
 door_close_pin.value = False
 
 
-def press_button(pin):
-    pin.value = True
-    time.sleep(0.1)
-    pin.value = False
+def door_open():
+
+    print("OPEN signal")
+
+    door_open_pin.value = True
+    time.sleep(1)
+
+    door_open_pin.value = False
+    time.sleep(1)
+
+    door_open_pin.value = True
+    time.sleep(1)
+
+    door_open_pin.value = False
+    time.sleep(1)
+
+    print("OPEN complete")
 
 
-def open_door():
-    print("Opening door")
-    press_button(door_open_pin)
+def door_close():
 
+    print("CLOSE signal")
 
-def close_door():
-    print("Closing door")
-    press_button(door_close_pin)
+    door_close_pin.value = True
+    time.sleep(1)
+
+    door_close_pin.value = False
+    time.sleep(1)
+
+    door_close_pin.value = True
+    time.sleep(1)
+
+    door_close_pin.value = False
+    time.sleep(1)
+
+    print("CLOSE complete")
