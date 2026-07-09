@@ -157,8 +157,7 @@ while True:
 
         reboot_pi()
 
-        # WEBSITE DOOR CONTROLS
-
+    # WEBSITE DOOR CONTROLS
     website_command = get_door_command()
 
     if website_command == "open":
