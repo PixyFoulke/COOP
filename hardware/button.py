@@ -5,7 +5,7 @@ import time
 import os
 
 
-button = digitalio.DigitalInOut(board.D17)
+button = digitalio.DigitalInOut(board.D5)
 
 button.direction = digitalio.Direction.INPUT
 button.pull = digitalio.Pull.UP
