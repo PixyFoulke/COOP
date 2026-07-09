@@ -66,21 +66,22 @@ def toggle_door():
     global door_state
     global last_door_command
 
-    # Ignore rapid presses
-    if time.time() - last_door_command < DOOR_COOLDOWN:
-        print("Door command ignored - cooldown")
-        return
-
-    last_door_command = time.time()
-
     if door_state == "closed":
 
         door_open()
+
+        print("Waiting for door movement to finish...")
+        time.sleep(15)
+
         door_state = "open"
 
     else:
 
         door_close()
+
+        print("Waiting for door movement to finish...")
+        time.sleep(15)
+
         door_state = "closed"
 
 
