@@ -1,31 +1,41 @@
 
 import board
-import busio
-import adafruit_ads1x15.ads1115 as ADS
-from adafruit_ads1x15.analog_in import AnalogIn
+import digitalio
+import time
+import os
 
 
-i2c = busio.I2C(board.SCL, board.SDA)
+button = digitalio.DigitalInOut(board.D17)
 
-ads = ADS.ADS1115(i2c)
-
-
-pr1 = AnalogIn(ads, 0)
-pr2 = AnalogIn(ads, 1)
+button.direction = digitalio.Direction.INPUT
+button.pull = digitalio.Pull.UP
 
 
-def get_light_values():
-    return pr1.value, pr2.value
+def reboot_pi():
+    os.system("sudo reboot")
 
 
-def get_light_voltages():
-    return pr1.voltage, pr2.voltage
+last_press = False
 
 
-def is_night(threshold=1.0):
-    avg_voltage = (pr1.voltage + pr2.voltage) / 2
-    return avg_voltage < threshold
+def get_button_action():
 
+    global last_press
 
-def get_light_state():
-    return "NIGHT" if is_night() else "DAY"
+    pressed = not button.value
+
+    # New press detected
+    if pressed and not last_press:
+
+        print("Button pressed")
+
+        last_press = True
+
+        return "toggle"
+
+    # Button released
+    if not pressed:
+
+        last_press = False
+
+    return None
