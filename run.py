@@ -12,7 +12,7 @@ from hardware.oled_display import update_status
 from software.email_alert import send_email_alert
 from hardware.sensors import getTemperature, getHumidity
 from hardware.ads import get_light_state
-from hardware.button_controller import (
+from hardware.button import (
     get_button_action,
     reboot_pi
 )
