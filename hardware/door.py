@@ -12,14 +12,15 @@ door_open_pin.direction = digitalio.Direction.OUTPUT
 door_close_pin.direction = digitalio.Direction.OUTPUT
 
 
-# idle state
 door_open_pin.value = False
 door_close_pin.value = False
 
 
-# Software tracking of last command
-# (Pi does not have actual door position feedback yet)
 door_state = "closed"
+
+# Prevent rapid button presses
+last_door_command = 0
+DOOR_COOLDOWN = 5
 
 
 def door_open():
@@ -63,6 +64,14 @@ def door_close():
 def toggle_door():
 
     global door_state
+    global last_door_command
+
+    # Ignore rapid presses
+    if time.time() - last_door_command < DOOR_COOLDOWN:
+        print("Door command ignored - cooldown")
+        return
+
+    last_door_command = time.time()
 
     if door_state == "closed":
 
