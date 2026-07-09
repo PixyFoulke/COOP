@@ -162,11 +162,96 @@ None
 
 
 
+
+<!-- DOOR CONTROL -->
+
+<div class="card">
+
+<h3>
+🚪 Door Control
+</h3>
+
+
+<button onclick="openDoor()">
+Open Door
+</button>
+
+
+<button onclick="closeDoor()">
+Close Door
+</button>
+
+
+<p id="doorStatus">
+Ready
+</p>
+
+
+</div>
+
+
+
 </div>
 
 
 
 <script src="js/dashboard.js"></script>
+
+
+<script>
+
+function openDoor(){
+
+    document.getElementById("doorStatus").innerHTML =
+    "Opening door...";
+
+
+    fetch(
+        "http://192.168.50.2:5000/door/open",
+        {
+            method: "POST"
+        }
+    )
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        document.getElementById("doorStatus").innerHTML =
+        data.message;
+
+    });
+
+}
+
+
+
+function closeDoor(){
+
+    document.getElementById("doorStatus").innerHTML =
+    "Closing door...";
+
+
+    fetch(
+        "http://192.168.50.2:5000/door/close",
+        {
+            method: "POST"
+        }
+    )
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        document.getElementById("doorStatus").innerHTML =
+        data.message;
+
+    });
+
+}
+
+
+</script>
 
 
 </body>
