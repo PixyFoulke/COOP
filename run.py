@@ -32,6 +32,11 @@ from software.api_client import (
     get_door_command
 )
 
+from software.database import (
+    init_database,
+    save_reading
+)
+
 
 # CAMERA 1 (OUTSIDE)
 picam2 = Picamera2(0)
@@ -45,8 +50,13 @@ picam2.start()
 
 
 # SHARED DATA
+# SHARED DATA
 last_email_time = 0
 EMAIL_COOLDOWN = 180
+
+# DATA LOGGING
+last_log_time = 0
+LOG_INTERVAL = 30   # change to 900
 
 chicken_count = 0
 inside_frame = None
@@ -91,6 +101,8 @@ threading.Thread(
     daemon=True
 ).start()
 
+
+init_database()
 
 print("COOP Safety System Running... Press 'q' to quit")
 
@@ -180,6 +192,21 @@ while True:
     with lock:
         chickens = chicken_count
         inside_display = inside_frame
+
+    # LOG DATA EVERY 15 MINUTES
+
+    if time.time() - last_log_time > LOG_INTERVAL:
+
+        save_reading(
+            temp_f,
+            humidity,
+            chickens,
+            threats
+        )
+
+        print("Data logged")
+
+        last_log_time = time.time()
 
     # ADD CHICKEN COUNT TEXT
     if inside_display is not None:
