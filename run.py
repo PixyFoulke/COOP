@@ -295,14 +295,16 @@ while True:
     # SEND VIDEO TO API
     update_frame(combined_frame)
 
-    # DISPLAY BOTH CAMERAS LOCALLY
-    cv2.imshow(
-        "COOP Safety System",
-        combined_frame
-    )
+    # DISPLAY BOTH CAMERAS LOCALLY ONLY IF A SCREEN IS AVAILABLE
+    if os.environ.get("DISPLAY"):
 
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
+        cv2.imshow(
+            "COOP Safety System",
+            combined_frame
+        )
+
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
 
     time.sleep(0.01)
 
