@@ -8,7 +8,7 @@
 <meta charset="UTF-8">
 
 <title>
-Door Control
+COOP Data
 </title>
 
 <link rel="stylesheet" href="css/style.css">
@@ -22,8 +22,12 @@ Door Control
 <header>
 
 <h1>
-🚪 Coop Door Control
+📊 COOP Data
 </h1>
+
+<p>
+24 Hour System History
+</p>
 
 
 <nav class="navbar">
@@ -55,19 +59,17 @@ Door Control
 
 
 
+
 <div class="dashboard">
 
 
 <div class="card">
 
 <h3>
-Door Status
+🌡 Temperature History
 </h3>
 
-<p id="doorStatus" class="value">
-Closed
-</p>
-
+<canvas id="temperatureChart"></canvas>
 
 </div>
 
@@ -76,19 +78,23 @@ Closed
 <div class="card">
 
 <h3>
-Manual Control
+💧 Humidity History
 </h3>
 
+<canvas id="humidityChart"></canvas>
 
-<button onclick="openDoor()">
-OPEN DOOR
-</button>
+</div>
 
 
-<button onclick="closeDoor()">
-CLOSE DOOR
-</button>
 
+
+<div class="card">
+
+<h3>
+🐔 Chicken Count History
+</h3>
+
+<canvas id="chickenChart"></canvas>
 
 </div>
 
@@ -96,46 +102,28 @@ CLOSE DOOR
 
 <div class="card">
 
-
 <h3>
-Automatic Schedule
+🚨 Threat History
 </h3>
 
+<div id="threatList">
 
-<label>
-Open Time
-</label>
+Loading...
 
-<input type="time"
-id="openTime">
+</div>
 
+</div>
 
-<br><br>
-
-
-<label>
-Close Time
-</label>
-
-<input type="time"
-id="closeTime">
-
-
-<br><br>
-
-
-<button>
-Save Schedule
-</button>
 
 
 </div>
 
 
-</div>
 
 
-<script src="js/door.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="js/data.js"></script>
 
 
 </body>
