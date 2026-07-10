@@ -56,7 +56,7 @@ EMAIL_COOLDOWN = 180
 
 # DATA LOGGING
 last_log_time = 0
-LOG_INTERVAL = 30   # change to 900
+LOG_INTERVAL = 900
 
 chicken_count = 0
 inside_frame = None
