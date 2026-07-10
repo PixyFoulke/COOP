@@ -5,6 +5,7 @@ import cv2
 import threading
 import json
 import os
+import sqlite3
 
 
 app = Flask(__name__)
@@ -107,6 +108,48 @@ def update_frame(frame):
 @app.route("/status")
 def status():
     return jsonify(system_data)
+
+
+# COOP DATA HISTORY
+@app.route("/history")
+def history():
+
+    db_path = os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "coop_data.db"
+    )
+
+    conn = sqlite3.connect(db_path)
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT timestamp, temperature, humidity, chickens, threats
+        FROM readings
+        WHERE timestamp >= datetime('now','-24 hours')
+        ORDER BY timestamp ASC
+    """)
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    data = []
+
+    for row in rows:
+
+        data.append(
+            {
+                "timestamp": row[0],
+                "temperature": row[1],
+                "humidity": row[2],
+                "chickens": row[3],
+                "threats": row[4]
+            }
+        )
+
+    return jsonify(data)
 
 
 # SAVE USER SETTINGS
