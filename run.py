@@ -54,7 +54,7 @@ last_settings_update = 0
 SETTINGS_REFRESH = 5
 
 
-# Tracks the exact scheduled event already executed
+# Tracks scheduled events already executed
 last_scheduled_open_key = None
 last_scheduled_close_key = None
 
@@ -65,7 +65,7 @@ alert_email = ""
 
 
 # Door state
-# False means the program assumes the door starts closed.
+# False means the program assumes the door starts closed
 door_is_open = False
 
 
@@ -160,11 +160,18 @@ def main():
             # CAPTURE OUTSIDE CAMERA FRAME
             try:
                 frame = picam2.capture_array()
-                result, threats, unknowns = process_frame(frame)
+
+                result, threats, unknowns = process_frame(
+                    frame
+                )
+
                 annotated_frame = result.plot()
 
             except Exception as error:
-                print(f"Outside camera or YOLO error: {error}")
+                print(
+                    f"Outside camera or YOLO error: {error}"
+                )
+
                 time.sleep(1)
                 continue
 
@@ -173,14 +180,20 @@ def main():
                 temp = getTemperature()
 
             except Exception as error:
-                print(f"Temperature sensor error: {error}")
+                print(
+                    f"Temperature sensor error: {error}"
+                )
+
                 temp = None
 
             try:
                 humidity = getHumidity()
 
             except Exception as error:
-                print(f"Humidity sensor error: {error}")
+                print(
+                    f"Humidity sensor error: {error}"
+                )
+
                 humidity = None
 
             if temp is None:
@@ -196,7 +209,10 @@ def main():
                 light_state = get_light_state()
 
             except Exception as error:
-                print(f"Light sensor error: {error}")
+                print(
+                    f"Light sensor error: {error}"
+                )
+
                 light_state = "UNKNOWN"
 
             current_time = time.strftime("%H:%M:%S")
@@ -214,7 +230,9 @@ def main():
 
                         door_is_open = False
 
-                        print("Door state set to closed")
+                        print(
+                            "Door state set to closed"
+                        )
 
                     else:
                         print("Button opening door")
@@ -223,7 +241,9 @@ def main():
 
                         door_is_open = True
 
-                        print("Door state set to open")
+                        print(
+                            "Door state set to open"
+                        )
 
                 elif action == "alarm":
                     print("Manual alarm test")
@@ -242,32 +262,31 @@ def main():
             except Exception as error:
                 print(f"Button error: {error}")
 
-            # WEBSITE DOOR CONTROLS
+            # WEBSITE AND AUTOMATIC DOOR CONTROLS
+            door_command = None
+
+            # CHECK WEBSITE COMMAND
             try:
                 website_command = get_door_command()
 
-                if website_command == "open":
-                    print("Website opening door")
+                if website_command in (
+                    "open",
+                    "close"
+                ):
+                    door_command = website_command
 
-                    door_open()
-
-                    door_is_open = True
-
-                    print("Door state set to open")
-
-                elif website_command == "close":
-                    print("Website closing door")
-
-                    door_close()
-
-                    door_is_open = False
-
-                    print("Door state set to closed")
+                    print(
+                        f"Website door command received: "
+                        f"{website_command}"
+                    )
 
             except Exception as error:
-                print(f"Website door command error: {error}")
+                print(
+                    f"Website door command error: "
+                    f"{error}"
+                )
 
-            # AUTOMATIC DOOR SCHEDULE
+            # CHECK AUTOMATIC SCHEDULE
             try:
                 schedule = get_door_schedule()
 
@@ -281,15 +300,18 @@ def main():
                     ""
                 )
 
-                current_minute = time.strftime("%H:%M")
-                current_date = time.strftime("%Y-%m-%d")
+                current_minute = time.strftime(
+                    "%H:%M"
+                )
 
-                # A unique key for today's configured opening time
+                current_date = time.strftime(
+                    "%Y-%m-%d"
+                )
+
                 open_schedule_key = (
                     f"{current_date} {open_time}"
                 )
 
-                # A unique key for today's configured closing time
                 close_schedule_key = (
                     f"{current_date} {close_time}"
                 )
@@ -306,20 +328,14 @@ def main():
                         f"{current_minute}"
                     )
 
-                    door_open()
-
-                    door_is_open = True
+                    door_command = "open"
 
                     last_scheduled_open_key = (
                         open_schedule_key
                     )
 
-                    print(
-                        "Scheduled opening completed"
-                    )
-
                 # SCHEDULED CLOSING
-                if (
+                elif (
                     close_time
                     and current_minute == close_time
                     and last_scheduled_close_key
@@ -330,21 +346,52 @@ def main():
                         f"{current_minute}"
                     )
 
-                    door_close()
-
-                    door_is_open = False
+                    door_command = "close"
 
                     last_scheduled_close_key = (
                         close_schedule_key
                     )
 
+            except Exception as error:
+                print(
+                    f"Door schedule error: {error}"
+                )
+
+            # EXECUTE WEBSITE OR SCHEDULE COMMAND
+            try:
+                if door_command == "open":
                     print(
-                        "Scheduled closing completed"
+                        "Executing door open command"
+                    )
+
+                    time.sleep(0.5)
+
+                    door_open()
+
+                    door_is_open = True
+
+                    print(
+                        "Door state set to open"
+                    )
+
+                elif door_command == "close":
+                    print(
+                        "Executing door close command"
+                    )
+
+                    time.sleep(0.5)
+
+                    door_close()
+
+                    door_is_open = False
+
+                    print(
+                        "Door state set to closed"
                     )
 
             except Exception as error:
                 print(
-                    f"Door schedule error: {error}"
+                    f"Door movement error: {error}"
                 )
 
             # GET INSIDE CAMERA DATA
@@ -358,7 +405,10 @@ def main():
                     inside_display = None
 
             # LOG DATA EVERY 15 MINUTES
-            if time.time() - last_log_time > LOG_INTERVAL:
+            if (
+                time.time() - last_log_time
+                > LOG_INTERVAL
+            ):
                 try:
                     save_reading(
                         temp_f,
@@ -372,7 +422,9 @@ def main():
                     last_log_time = time.time()
 
                 except Exception as error:
-                    print(f"Database error: {error}")
+                    print(
+                        f"Database error: {error}"
+                    )
 
             # ADD CHICKEN COUNT TEXT
             if inside_display is not None:
@@ -407,9 +459,11 @@ def main():
                 trigger_alarm()
 
                 try:
-                    if time.time() - last_email_time > EMAIL_COOLDOWN:
+                    if (
+                        time.time() - last_email_time
+                        > EMAIL_COOLDOWN
+                    ):
 
-                        # CREATE ALERTS DIRECTORY
                         alerts_directory = os.path.join(
                             os.path.dirname(
                                 os.path.abspath(__file__)
@@ -422,10 +476,11 @@ def main():
                             exist_ok=True
                         )
 
-                        # CREATE UNIQUE IMAGE NAME
                         image_filename = (
                             "threat_"
-                            + time.strftime("%Y%m%d_%H%M%S")
+                            + time.strftime(
+                                "%Y%m%d_%H%M%S"
+                            )
                             + ".jpg"
                         )
 
@@ -434,22 +489,21 @@ def main():
                             image_filename
                         )
 
-                        # SAVE THREAT IMAGE
                         image_saved = cv2.imwrite(
                             image_path,
                             annotated_frame
                         )
 
                         if image_saved:
-                            threat_type = ", ".join(threats)
+                            threat_type = ", ".join(
+                                threats
+                            )
 
-                            # SAVE EVENT TO DATABASE
                             save_threat_event(
                                 threat_type,
                                 image_filename
                             )
 
-                            # SEND SAME IMAGE BY EMAIL
                             send_email_alert(
                                 image_path,
                                 alert_email
@@ -468,7 +522,9 @@ def main():
                         last_email_time = time.time()
 
                 except Exception as error:
-                    print(f"Email error: {error}")
+                    print(
+                        f"Email error: {error}"
+                    )
 
             elif status == "UNKNOWN":
                 warning_state()
@@ -488,7 +544,9 @@ def main():
                 )
 
             except Exception as error:
-                print(f"OLED error: {error}")
+                print(
+                    f"OLED error: {error}"
+                )
 
             # UPDATE WEBSITE DATA
             try:
@@ -503,7 +561,9 @@ def main():
                 )
 
             except Exception as error:
-                print(f"API data error: {error}")
+                print(
+                    f"API data error: {error}"
+                )
 
             # CREATE COMBINED VIDEO FRAME
             if inside_display is not None:
@@ -517,7 +577,8 @@ def main():
 
                 except Exception as error:
                     print(
-                        f"Frame combination error: {error}"
+                        f"Frame combination error: "
+                        f"{error}"
                     )
 
                     combined_frame = annotated_frame
@@ -527,10 +588,14 @@ def main():
 
             # SEND VIDEO TO API
             try:
-                update_frame(combined_frame)
+                update_frame(
+                    combined_frame
+                )
 
             except Exception as error:
-                print(f"Video API error: {error}")
+                print(
+                    f"Video API error: {error}"
+                )
 
             # DISPLAY CAMERA WINDOW WHEN DESKTOP IS AVAILABLE
             if os.environ.get("DISPLAY"):
@@ -539,15 +604,22 @@ def main():
                     combined_frame
                 )
 
-                if cv2.waitKey(1) & 0xFF == ord("q"):
-                    print("Q pressed. Stopping...")
+                if (
+                    cv2.waitKey(1) & 0xFF
+                    == ord("q")
+                ):
+                    print(
+                        "Q pressed. Stopping..."
+                    )
+
                     break
 
             time.sleep(0.01)
 
     except KeyboardInterrupt:
         print(
-            "\nCtrl+C pressed. Stopping COOP system..."
+            "\nCtrl+C pressed. "
+            "Stopping COOP system..."
         )
 
     finally:
@@ -570,7 +642,9 @@ def main():
 
         print("Cameras stopped")
         print("GPIO resources released")
-        print("COOP system shut down safely")
+        print(
+            "COOP system shut down safely"
+        )
 
 
 if __name__ == "__main__":
