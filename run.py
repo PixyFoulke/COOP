@@ -53,8 +53,10 @@ LOG_INTERVAL = 900
 last_settings_update = 0
 SETTINGS_REFRESH = 5
 
-last_scheduled_open_date = None
-last_scheduled_close_date = None
+
+# Tracks the exact scheduled event already executed
+last_scheduled_open_key = None
+last_scheduled_close_key = None
 
 
 # User settings
@@ -94,8 +96,8 @@ def main():
     global expected_chickens
     global alert_email
     global door_is_open
-    global last_scheduled_open_date
-    global last_scheduled_close_date
+    global last_scheduled_open_key
+    global last_scheduled_close_key
 
     picam2 = None
 
@@ -282,40 +284,65 @@ def main():
                 current_minute = time.strftime("%H:%M")
                 current_date = time.strftime("%Y-%m-%d")
 
+                # A unique key for today's configured opening time
+                open_schedule_key = (
+                    f"{current_date} {open_time}"
+                )
+
+                # A unique key for today's configured closing time
+                close_schedule_key = (
+                    f"{current_date} {close_time}"
+                )
+
+                # SCHEDULED OPENING
                 if (
                     open_time
                     and current_minute == open_time
-                    and last_scheduled_open_date != current_date
+                    and last_scheduled_open_key
+                    != open_schedule_key
                 ):
-
                     print(
-                        f"Scheduled door opening at {current_minute}"
+                        f"Scheduled door opening at "
+                        f"{current_minute}"
                     )
 
                     door_open()
 
                     door_is_open = True
 
-                    last_scheduled_open_date = current_date
+                    last_scheduled_open_key = (
+                        open_schedule_key
+                    )
 
+                    print(
+                        "Scheduled opening completed"
+                    )
+
+                # SCHEDULED CLOSING
                 if (
                     close_time
                     and current_minute == close_time
-                    and last_scheduled_close_date != current_date
+                    and last_scheduled_close_key
+                    != close_schedule_key
                 ):
-
                     print(
-                        f"Scheduled door closing at {current_minute}"
+                        f"Scheduled door closing at "
+                        f"{current_minute}"
                     )
 
                     door_close()
 
                     door_is_open = False
 
-                    last_scheduled_close_date = current_date
+                    last_scheduled_close_key = (
+                        close_schedule_key
+                    )
+
+                    print(
+                        "Scheduled closing completed"
+                    )
 
             except Exception as error:
-
                 print(
                     f"Door schedule error: {error}"
                 )
