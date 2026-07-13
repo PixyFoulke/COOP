@@ -22,7 +22,8 @@ from software.api_client import (
     update_system_data,
     update_frame,
     start_api,
-    get_door_command
+    get_door_command,
+    get_door_schedule
 )
 
 from software.database import (
@@ -51,6 +52,9 @@ LOG_INTERVAL = 900
 
 last_settings_update = 0
 SETTINGS_REFRESH = 5
+
+last_scheduled_open_date = None
+last_scheduled_close_date = None
 
 
 # User settings
@@ -90,6 +94,8 @@ def main():
     global expected_chickens
     global alert_email
     global door_is_open
+    global last_scheduled_open_date
+    global last_scheduled_close_date
 
     picam2 = None
 
@@ -258,6 +264,61 @@ def main():
 
             except Exception as error:
                 print(f"Website door command error: {error}")
+
+            # AUTOMATIC DOOR SCHEDULE
+            try:
+                schedule = get_door_schedule()
+
+                open_time = schedule.get(
+                    "open_time",
+                    ""
+                )
+
+                close_time = schedule.get(
+                    "close_time",
+                    ""
+                )
+
+                current_minute = time.strftime("%H:%M")
+                current_date = time.strftime("%Y-%m-%d")
+
+                if (
+                    open_time
+                    and current_minute == open_time
+                    and last_scheduled_open_date != current_date
+                ):
+
+                    print(
+                        f"Scheduled door opening at {current_minute}"
+                    )
+
+                    door_open()
+
+                    door_is_open = True
+
+                    last_scheduled_open_date = current_date
+
+                if (
+                    close_time
+                    and current_minute == close_time
+                    and last_scheduled_close_date != current_date
+                ):
+
+                    print(
+                        f"Scheduled door closing at {current_minute}"
+                    )
+
+                    door_close()
+
+                    door_is_open = False
+
+                    last_scheduled_close_date = current_date
+
+            except Exception as error:
+
+                print(
+                    f"Door schedule error: {error}"
+                )
 
             # GET INSIDE CAMERA DATA
             with lock:
