@@ -65,8 +65,6 @@ function loadData(){
             chickens
         );
 
-        loadThreats();
-
     })
 
     .catch(error => {
@@ -348,10 +346,16 @@ function loadThreats(){
 
 // LOAD WHEN PAGE OPENS
 loadData();
+loadThreats();
 
 
 // REFRESH EVERY MINUTE
 setInterval(
     loadData,
+    60000
+);
+
+setInterval(
+    loadThreats,
     60000
 );

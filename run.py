@@ -13,7 +13,7 @@ from software.email_alert import send_email_alert
 from hardware.sensors import getTemperature, getHumidity
 from hardware.ads import get_light_state
 from hardware.button import get_button_action, reboot_pi
-from hardware.door import toggle_door, door_open, door_close
+from hardware.door import door_open, door_close
 from ai.yolo_detector import process_frame
 from ai.chicken_counter import get_chicken_count
 from config.settings import get_settings
@@ -58,6 +58,11 @@ expected_chickens = 0
 alert_email = ""
 
 
+# Door state
+# False means the program assumes the door starts closed.
+door_is_open = False
+
+
 def chicken_loop():
     global chicken_count
     global inside_frame
@@ -84,6 +89,7 @@ def main():
     global last_settings_update
     global expected_chickens
     global alert_email
+    global door_is_open
 
     picam2 = None
 
@@ -157,18 +163,21 @@ def main():
             # SENSOR DATA
             try:
                 temp = getTemperature()
+
             except Exception as error:
                 print(f"Temperature sensor error: {error}")
                 temp = None
 
             try:
                 humidity = getHumidity()
+
             except Exception as error:
                 print(f"Humidity sensor error: {error}")
                 humidity = None
 
             if temp is None:
                 temp_f = 0
+
             else:
                 temp_f = (temp * 9 / 5) + 32
 
@@ -177,6 +186,7 @@ def main():
 
             try:
                 light_state = get_light_state()
+
             except Exception as error:
                 print(f"Light sensor error: {error}")
                 light_state = "UNKNOWN"
@@ -188,17 +198,37 @@ def main():
                 action = get_button_action()
 
                 if action == "toggle":
-                    print("Door button pressed")
-                    toggle_door()
+
+                    if door_is_open:
+                        print("Button closing door")
+
+                        door_close()
+
+                        door_is_open = False
+
+                        print("Door state set to closed")
+
+                    else:
+                        print("Button opening door")
+
+                        door_open()
+
+                        door_is_open = True
+
+                        print("Door state set to open")
 
                 elif action == "alarm":
                     print("Manual alarm test")
+
                     trigger_alarm()
+
                     time.sleep(3)
+
                     safe_state()
 
                 elif action == "restart":
                     print("Restarting Raspberry Pi")
+
                     reboot_pi()
 
             except Exception as error:
@@ -210,11 +240,21 @@ def main():
 
                 if website_command == "open":
                     print("Website opening door")
+
                     door_open()
+
+                    door_is_open = True
+
+                    print("Door state set to open")
 
                 elif website_command == "close":
                     print("Website closing door")
+
                     door_close()
+
+                    door_is_open = False
+
+                    print("Door state set to closed")
 
             except Exception as error:
                 print(f"Website door command error: {error}")
@@ -225,6 +265,7 @@ def main():
 
                 if inside_frame is not None:
                     inside_display = inside_frame.copy()
+
                 else:
                     inside_display = None
 
@@ -239,6 +280,7 @@ def main():
                     )
 
                     print("Data logged")
+
                     last_log_time = time.time()
 
                 except Exception as error:
@@ -274,16 +316,16 @@ def main():
 
             # RUN ACTIONS
             if status == "THREAT":
-
                 trigger_alarm()
 
                 try:
-
                     if time.time() - last_email_time > EMAIL_COOLDOWN:
 
                         # CREATE ALERTS DIRECTORY
                         alerts_directory = os.path.join(
-                            os.path.dirname(os.path.abspath(__file__)),
+                            os.path.dirname(
+                                os.path.abspath(__file__)
+                            ),
                             "alerts"
                         )
 
@@ -294,9 +336,9 @@ def main():
 
                         # CREATE UNIQUE IMAGE NAME
                         image_filename = (
-                            "threat_" +
-                            time.strftime("%Y%m%d_%H%M%S") +
-                            ".jpg"
+                            "threat_"
+                            + time.strftime("%Y%m%d_%H%M%S")
+                            + ".jpg"
                         )
 
                         image_path = os.path.join(
@@ -311,7 +353,6 @@ def main():
                         )
 
                         if image_saved:
-
                             threat_type = ", ".join(threats)
 
                             # SAVE EVENT TO DATABASE
@@ -327,11 +368,11 @@ def main():
                             )
 
                             print(
-                                f"Threat image saved: {image_filename}"
+                                f"Threat image saved: "
+                                f"{image_filename}"
                             )
 
                         else:
-
                             print(
                                 "Failed to save threat image"
                             )
@@ -339,7 +380,6 @@ def main():
                         last_email_time = time.time()
 
                 except Exception as error:
-
                     print(f"Email error: {error}")
 
             elif status == "UNKNOWN":
@@ -388,7 +428,10 @@ def main():
                     )
 
                 except Exception as error:
-                    print(f"Frame combination error: {error}")
+                    print(
+                        f"Frame combination error: {error}"
+                    )
+
                     combined_frame = annotated_frame
 
             else:
@@ -397,6 +440,7 @@ def main():
             # SEND VIDEO TO API
             try:
                 update_frame(combined_frame)
+
             except Exception as error:
                 print(f"Video API error: {error}")
 
@@ -414,13 +458,16 @@ def main():
             time.sleep(0.01)
 
     except KeyboardInterrupt:
-        print("\nCtrl+C pressed. Stopping COOP system...")
+        print(
+            "\nCtrl+C pressed. Stopping COOP system..."
+        )
 
     finally:
         stop_event.set()
 
         try:
             safe_state()
+
         except Exception:
             pass
 
@@ -429,6 +476,7 @@ def main():
         if picam2 is not None:
             try:
                 picam2.stop()
+
             except Exception:
                 pass
 

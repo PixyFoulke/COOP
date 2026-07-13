@@ -271,3 +271,68 @@ canvas {
     max-height:350px;
 
 }
+
+
+canvas {
+
+    max-height:350px;
+
+}
+
+
+/* THREAT HISTORY */
+
+.threat-card {
+
+    background:#111827;
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+    margin-top:15px;
+
+    box-shadow:
+    0 6px 16px rgba(0,0,0,0.35);
+
+}
+
+
+.threat-image {
+
+    width:100%;
+
+    height:220px;
+
+    object-fit:cover;
+
+    display:block;
+
+}
+
+
+.threat-details {
+
+    padding:15px;
+
+    text-align:center;
+
+}
+
+
+.threat-details h3 {
+
+    margin:0 0 10px 0;
+
+    color:#ef4444;
+
+}
+
+
+.threat-details p {
+
+    margin:0;
+
+    color:#d1d5db;
+
+}
