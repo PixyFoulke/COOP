@@ -1,4 +1,6 @@
 
+console.log("Updated door.js loaded");
+
 console.log("Door page ready");
 
 
