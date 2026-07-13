@@ -1,5 +1,12 @@
 
-from flask import Flask, jsonify, Response, request
+from flask import (
+    Flask,
+    jsonify,
+    Response,
+    request,
+    send_from_directory
+)
+
 from flask_cors import CORS
 import cv2
 import threading
@@ -218,6 +225,68 @@ def save_settings():
 
         }
 
+    )
+
+
+# THREAT EVENT HISTORY
+@app.route("/threats/history")
+def threat_history():
+
+    db_path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            "..",
+            "coop_data.db"
+        )
+    )
+
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            timestamp,
+            threat_type,
+            image_filename
+        FROM threat_events
+        WHERE timestamp >= datetime('now', '-24 hours')
+        ORDER BY timestamp DESC
+    """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    data = []
+
+    for row in rows:
+
+        data.append({
+            "timestamp": row[0],
+            "threat_type": row[1],
+            "image_filename": row[2],
+            "image_url": (
+                "/alerts/" + row[2]
+            )
+        })
+
+    return jsonify(data)
+
+
+# SERVE THREAT IMAGES
+@app.route("/alerts/<path:filename>")
+def alert_image(filename):
+
+    alerts_directory = os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            "..",
+            "alerts"
+        )
+    )
+
+    return send_from_directory(
+        alerts_directory,
+        filename
     )
 
 

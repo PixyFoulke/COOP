@@ -25,7 +25,11 @@ from software.api_client import (
     get_door_command
 )
 
-from software.database import init_database, save_reading
+from software.database import (
+    init_database,
+    save_reading,
+    save_threat_event
+)
 
 
 # Used to stop background loops cleanly
@@ -270,25 +274,73 @@ def main():
 
             # RUN ACTIONS
             if status == "THREAT":
+
                 trigger_alarm()
 
-                if time.time() - last_email_time > EMAIL_COOLDOWN:
-                    cv2.imwrite(
-                        "threat.jpg",
-                        annotated_frame
-                    )
+                try:
 
-                    if alert_email:
-                        try:
+                    if time.time() - last_email_time > EMAIL_COOLDOWN:
+
+                        # CREATE ALERTS DIRECTORY
+                        alerts_directory = os.path.join(
+                            os.path.dirname(os.path.abspath(__file__)),
+                            "alerts"
+                        )
+
+                        os.makedirs(
+                            alerts_directory,
+                            exist_ok=True
+                        )
+
+                        # CREATE UNIQUE IMAGE NAME
+                        image_filename = (
+                            "threat_" +
+                            time.strftime("%Y%m%d_%H%M%S") +
+                            ".jpg"
+                        )
+
+                        image_path = os.path.join(
+                            alerts_directory,
+                            image_filename
+                        )
+
+                        # SAVE THREAT IMAGE
+                        image_saved = cv2.imwrite(
+                            image_path,
+                            annotated_frame
+                        )
+
+                        if image_saved:
+
+                            threat_type = ", ".join(threats)
+
+                            # SAVE EVENT TO DATABASE
+                            save_threat_event(
+                                threat_type,
+                                image_filename
+                            )
+
+                            # SEND SAME IMAGE BY EMAIL
                             send_email_alert(
-                                "threat.jpg",
+                                image_path,
                                 alert_email
                             )
 
-                            last_email_time = time.time()
+                            print(
+                                f"Threat image saved: {image_filename}"
+                            )
 
-                        except Exception as error:
-                            print(f"Email error: {error}")
+                        else:
+
+                            print(
+                                "Failed to save threat image"
+                            )
+
+                        last_email_time = time.time()
+
+                except Exception as error:
+
+                    print(f"Email error: {error}")
 
             elif status == "UNKNOWN":
                 warning_state()
