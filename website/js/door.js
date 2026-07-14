@@ -92,24 +92,93 @@ function closeDoor(){
 }
 
 
+function updateScheduleDisplay(){
+
+    const mode =
+        document.getElementById(
+            "scheduleMode"
+        ).value;
+
+    const sunSchedule =
+        document.getElementById(
+            "sunSchedule"
+        );
+
+    const manualSchedule =
+        document.getElementById(
+            "manualSchedule"
+        );
+
+
+    if(mode === "sunrise_sunset"){
+
+        sunSchedule.style.display =
+            "block";
+
+        manualSchedule.style.display =
+            "none";
+
+    }
+
+    else{
+
+        sunSchedule.style.display =
+            "none";
+
+        manualSchedule.style.display =
+            "block";
+
+    }
+
+}
+
+
 function saveSchedule(){
 
+    const mode =
+        document.getElementById(
+            "scheduleMode"
+        ).value;
+
     const openTime =
-        document.getElementById("openTime").value;
+        document.getElementById(
+            "openTime"
+        ).value;
 
     const closeTime =
-        document.getElementById("closeTime").value;
+        document.getElementById(
+            "closeTime"
+        ).value;
 
     const status =
-        document.getElementById("scheduleStatus");
+        document.getElementById(
+            "scheduleStatus"
+        );
 
 
-    if(!openTime || !closeTime){
+    if(
+        mode === "manual"
+        && (!openTime || !closeTime)
+    ){
 
         status.innerHTML =
-            "Please select both times.";
+            "Please select both manual times.";
 
         return;
+
+    }
+
+
+    if(
+        mode === "manual"
+        && openTime === closeTime
+    ){
+
+        status.innerHTML =
+            "Open and close times must be different.";
+
+        return;
+
     }
 
 
@@ -123,32 +192,66 @@ function saveSchedule(){
             method: "POST",
 
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type":
+                    "application/json"
             },
 
             body: JSON.stringify({
+                mode: mode,
                 open_time: openTime,
                 close_time: closeTime
             })
         }
     )
 
-    .then(response => response.json())
+    .then(response => {
+
+        return response.json().then(data => {
+
+            if(!response.ok){
+
+                throw new Error(
+                    data.error ||
+                    "Schedule could not be saved"
+                );
+
+            }
+
+            return data;
+
+        });
+
+    })
 
     .then(data => {
 
-        status.innerHTML =
-            `Door will open at ${data.open_time}
-            and close at ${data.close_time}.`;
+        if(data.mode === "sunrise_sunset"){
+
+            status.innerHTML =
+                "Saved: door will open at sunrise "
+                + "and close at sunset.";
+
+        }
+
+        else{
+
+            status.innerHTML =
+                `Saved: opens at ${data.open_time} `
+                + `and closes at ${data.close_time}.`;
+
+        }
 
     })
 
     .catch(error => {
 
-        console.log(error);
+        console.error(
+            "Schedule save error:",
+            error
+        );
 
         status.innerHTML =
-            "Unable to save schedule.";
+            "Error: " + error.message;
 
     });
 
@@ -163,27 +266,54 @@ function loadSchedule(){
 
     .then(data => {
 
+        const mode =
+            data.mode || "sunrise_sunset";
+
+        document.getElementById(
+            "scheduleMode"
+        ).value = mode;
+
+
         if(data.open_time){
 
-            document.getElementById("openTime").value =
-                data.open_time;
+            document.getElementById(
+                "openTime"
+            ).value = data.open_time;
 
         }
+
 
         if(data.close_time){
 
-            document.getElementById("closeTime").value =
-                data.close_time;
+            document.getElementById(
+                "closeTime"
+            ).value = data.close_time;
 
         }
 
-        if(data.open_time && data.close_time){
 
+        updateScheduleDisplay();
+
+
+        const status =
             document.getElementById(
                 "scheduleStatus"
-            ).innerHTML =
-                `Door opens at ${data.open_time}
-                and closes at ${data.close_time}.`;
+            );
+
+
+        if(mode === "sunrise_sunset"){
+
+            status.innerHTML =
+                "Door opens at sunrise "
+                + "and closes at sunset.";
+
+        }
+
+        else{
+
+            status.innerHTML =
+                `Door opens at ${data.open_time} `
+                + `and closes at ${data.close_time}.`;
 
         }
 
@@ -191,10 +321,15 @@ function loadSchedule(){
 
     .catch(error => {
 
-        console.log(
+        console.error(
             "Schedule loading error:",
             error
         );
+
+        document.getElementById(
+            "scheduleStatus"
+        ).innerHTML =
+            "Unable to load schedule.";
 
     });
 

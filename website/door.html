@@ -72,7 +72,6 @@ Door Status
 Closed
 </p>
 
-
 </div>
 
 
@@ -83,16 +82,13 @@ Closed
 Manual Control
 </h3>
 
-
 <button onclick="openDoor()">
 OPEN DOOR
 </button>
 
-
 <button onclick="closeDoor()">
 CLOSE DOOR
 </button>
-
 
 </div>
 
@@ -100,50 +96,93 @@ CLOSE DOOR
 
 <div class="card">
 
-
 <h3>
-Automatic Schedule
+Door Schedule
 </h3>
 
 
-<label>
+<label for="scheduleMode">
+Schedule Mode
+</label>
+
+<br><br>
+
+
+<select
+id="scheduleMode"
+onchange="updateScheduleDisplay()">
+
+<option value="sunrise_sunset">
+Sunrise / Sunset
+</option>
+
+<option value="manual">
+Manual Times
+</option>
+
+</select>
+
+
+
+<div id="sunSchedule">
+
+<p>
+🌅 Door opens at sunrise
+</p>
+
+<p>
+🌇 Door closes at sunset
+</p>
+
+</div>
+
+
+
+<div id="manualSchedule">
+
+<br>
+
+<label for="openTime">
 Open Time
 </label>
 
-<input type="time"
+<input
+type="time"
 id="openTime">
-
 
 <br><br>
 
 
-<label>
+<label for="closeTime">
 Close Time
 </label>
 
-<input type="time"
+<input
+type="time"
 id="closeTime">
 
+</div>
 
-<br><br>
+
+<br>
 
 
 <button onclick="saveSchedule()">
 Save Schedule
 </button>
 
+
 <p id="scheduleStatus">
-No schedule saved
+Loading schedule...
 </p>
 
-
 </div>
 
 
 </div>
 
 
-<script src="js/door.js?v=2"></script>
+<script src="js/door.js?v=3"></script>
 
 
 </body>

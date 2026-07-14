@@ -40,6 +40,7 @@ door_command = None
 
 # DOOR SCHEDULE
 door_schedule = {
+    "mode": "sunrise_sunset",
     "open_time": "",
     "close_time": ""
 }
@@ -96,10 +97,14 @@ def save_door_schedule():
     data = request.get_json()
 
     if data is None:
-
         return jsonify({
             "error": "No schedule data received"
         }), 400
+
+    mode = data.get(
+        "mode",
+        "sunrise_sunset"
+    )
 
     open_time = data.get(
         "open_time",
@@ -111,19 +116,30 @@ def save_door_schedule():
         ""
     )
 
-    if not open_time or not close_time:
-
+    if mode not in (
+        "sunrise_sunset",
+        "manual"
+    ):
         return jsonify({
-            "error": "Both times are required"
+            "error": "Invalid schedule mode"
         }), 400
 
-    if open_time == close_time:
+    if mode == "manual":
 
-        return jsonify({
-            "error": "Open and close times must be different"
-        }), 400
+        if not open_time or not close_time:
+            return jsonify({
+                "error": "Both manual times are required"
+            }), 400
+
+        if open_time == close_time:
+            return jsonify({
+                "error": (
+                    "Open and close times must be different"
+                )
+            }), 400
 
     door_schedule = {
+        "mode": mode,
         "open_time": open_time,
         "close_time": close_time
     }
@@ -138,9 +154,7 @@ def save_door_schedule():
     )
 
     try:
-
         with open(schedule_file, "w") as file:
-
             json.dump(
                 door_schedule,
                 file,
@@ -148,13 +162,15 @@ def save_door_schedule():
             )
 
     except Exception as error:
-
         return jsonify({
-            "error": f"Could not save schedule: {error}"
+            "error": (
+                f"Could not save schedule: {error}"
+            )
         }), 500
 
     return jsonify({
         "message": "Door schedule saved",
+        "mode": mode,
         "open_time": open_time,
         "close_time": close_time
     })
@@ -194,6 +210,10 @@ def load_door_schedule():
             saved_schedule = json.load(file)
 
         door_schedule = {
+            "mode": saved_schedule.get(
+                "mode",
+                "sunrise_sunset"
+            ),
             "open_time": saved_schedule.get(
                 "open_time",
                 ""
