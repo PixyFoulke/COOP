@@ -1,4 +1,6 @@
-# classifies labels as either SAFE, THREAT, or UNKNOWN based on labels from the yolo_detection code
+
+# classifies labels as either SAFE, THREAT, UNKNOWN, or IGNORE
+# based on labels from the YOLO detection code
 
 SAFE = {
     "deer",
@@ -15,7 +17,6 @@ SAFE = {
 THREAT = {
     "fox",
     "predatory bird",
-    "bear",
     "opossum",
     "snake",
     "coyote",
@@ -23,13 +24,23 @@ THREAT = {
     "skunk"
 }
 
+IGNORE = {
+    "bear"
+}
+
 
 def classify(label: str):
+
     label = label.lower().strip()
 
-    if label in SAFE:
+    if label in IGNORE:
+        return "IGNORE"
+
+    elif label in SAFE:
         return "SAFE"
+
     elif label in THREAT:
         return "THREAT"
+
     else:
         return "UNKNOWN"

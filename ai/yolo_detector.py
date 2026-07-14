@@ -13,7 +13,14 @@ model = YOLO(MODEL_PATH)
 
 
 def process_frame(frame):
-    results = model(frame, verbose=False, imgsz=640, conf=0.5)
+
+    results = model(
+        frame,
+        verbose=False,
+        imgsz=640,
+        conf=0.5
+    )
+
     result = results[0]
 
     detections = result.boxes
@@ -25,16 +32,23 @@ def process_frame(frame):
         return result, threats, unknowns
 
     for box in detections:
+
         if box.cls is None:
             continue
 
         cls_id = int(box.cls[0])
+
         label = model.names[cls_id]
 
         status = classify(label)
 
+        # Ignore detections such as bears
+        if status == "IGNORE":
+            continue
+
         if status == "THREAT":
             threats.append(label)
+
         elif status == "UNKNOWN":
             unknowns.append(label)
 
