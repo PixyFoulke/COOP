@@ -13,6 +13,7 @@ import threading
 import json
 import os
 import sqlite3
+import requests
 
 
 app = Flask(__name__)
@@ -481,6 +482,184 @@ def video_feed():
             "boundary=frame"
         )
     )
+
+
+# LOCAL WEATHER DATA
+@app.route("/weather")
+def weather():
+
+    latitude = request.args.get(
+        "latitude",
+        type=float
+    )
+
+    longitude = request.args.get(
+        "longitude",
+        type=float
+    )
+
+    if latitude is None or longitude is None:
+
+        return jsonify({
+            "error": "Latitude and longitude are required"
+        }), 400
+
+    weather_url = (
+        "https://api.open-meteo.com/v1/forecast"
+    )
+
+    parameters = {
+        "latitude": latitude,
+        "longitude": longitude,
+
+        "current": (
+            "temperature_2m,"
+            "relative_humidity_2m,"
+            "apparent_temperature,"
+            "weather_code,"
+            "wind_speed_10m"
+        ),
+
+        "daily": (
+            "sunrise,"
+            "sunset,"
+            "precipitation_probability_max"
+        ),
+
+        "temperature_unit": "fahrenheit",
+        "wind_speed_unit": "mph",
+        "precipitation_unit": "inch",
+        "timezone": "auto",
+        "forecast_days": 1
+    }
+
+    try:
+
+        response = requests.get(
+            weather_url,
+            params=parameters,
+            timeout=10
+        )
+
+        response.raise_for_status()
+
+        weather_data = response.json()
+
+        current = weather_data.get(
+            "current",
+            {}
+        )
+
+        daily = weather_data.get(
+            "daily",
+            {}
+        )
+
+        weather_code = current.get(
+            "weather_code"
+        )
+
+        conditions = {
+            0: "Clear",
+            1: "Mostly Clear",
+            2: "Partly Cloudy",
+            3: "Cloudy",
+            45: "Fog",
+            48: "Freezing Fog",
+            51: "Light Drizzle",
+            53: "Drizzle",
+            55: "Heavy Drizzle",
+            61: "Light Rain",
+            63: "Rain",
+            65: "Heavy Rain",
+            71: "Light Snow",
+            73: "Snow",
+            75: "Heavy Snow",
+            80: "Light Showers",
+            81: "Showers",
+            82: "Heavy Showers",
+            95: "Thunderstorm",
+            96: "Thunderstorm with Hail",
+            99: "Severe Thunderstorm with Hail"
+        }
+
+        sunrise_values = daily.get(
+            "sunrise",
+            []
+        )
+
+        sunset_values = daily.get(
+            "sunset",
+            []
+        )
+
+        rain_values = daily.get(
+            "precipitation_probability_max",
+            []
+        )
+
+        return jsonify({
+
+            "temperature": current.get(
+                "temperature_2m"
+            ),
+
+            "feels_like": current.get(
+                "apparent_temperature"
+            ),
+
+            "humidity": current.get(
+                "relative_humidity_2m"
+            ),
+
+            "wind_speed": current.get(
+                "wind_speed_10m"
+            ),
+
+            "condition": conditions.get(
+                weather_code,
+                "Unknown"
+            ),
+
+            "sunrise": (
+                sunrise_values[0]
+                if sunrise_values
+                else None
+            ),
+
+            "sunset": (
+                sunset_values[0]
+                if sunset_values
+                else None
+            ),
+
+            "rain_chance": (
+                rain_values[0]
+                if rain_values
+                else 0
+            )
+
+        })
+
+    except requests.RequestException as error:
+
+        print(
+            f"Weather service error: {error}"
+        )
+
+        return jsonify({
+            "error": "Weather service unavailable"
+        }), 502
+
+    except Exception as error:
+
+        print(
+            f"Weather processing error: {error}"
+        )
+
+        return jsonify({
+            "error": "Could not process weather data"
+        }), 500
 
 
 # START SERVER
