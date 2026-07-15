@@ -5,6 +5,7 @@ import os
 import cv2
 import time
 import threading
+from datetime import datetime, timedelta
 from picamera2 import Picamera2
 
 from ai.actions import trigger_alarm, safe_state, warning_state
@@ -53,6 +54,11 @@ LOG_INTERVAL = 900
 last_settings_update = 0
 SETTINGS_REFRESH = 5
 
+# Missing-chicken alert settings
+MISSING_ALERT_DELAY_MINUTES = 15
+last_missing_email_date = None
+sunset_time = ""
+
 
 # Tracks scheduled events already executed
 last_scheduled_open_key = None
@@ -98,6 +104,8 @@ def main():
     global door_is_open
     global last_scheduled_open_key
     global last_scheduled_close_key
+    global last_missing_email_date
+    global sunset_time
 
     picam2 = None
 
@@ -149,6 +157,11 @@ def main():
 
                     alert_email = settings.get(
                         "email",
+                        ""
+                    )
+
+                    sunset_time = settings.get(
+                        "sunset",
                         ""
                     )
 
@@ -404,6 +417,40 @@ def main():
                 else:
                     inside_display = None
 
+            # CHECK WHETHER IT IS 15 MINUTES AFTER SUNSET
+            now = datetime.now()
+            after_missing_check_time = False
+
+            if sunset_time:
+
+                try:
+                    sunset_clock = datetime.strptime(
+                        sunset_time,
+                        "%H:%M"
+                    ).time()
+
+                    sunset_today = datetime.combine(
+                        now.date(),
+                        sunset_clock
+                    )
+
+                    missing_check_time = (
+                        sunset_today
+                        + timedelta(
+                            minutes=MISSING_ALERT_DELAY_MINUTES
+                        )
+                    )
+
+                    after_missing_check_time = (
+                        now >= missing_check_time
+                    )
+
+                except ValueError:
+                    print(
+                        f"Invalid sunset time in settings: "
+                        f"{sunset_time}"
+                    )
+
             # LOG DATA EVERY 15 MINUTES
             if (
                 time.time() - last_log_time
@@ -445,7 +492,11 @@ def main():
             elif len(unknowns) > 0:
                 status = "UNKNOWN"
 
-            elif chickens < expected_chickens:
+            elif (
+                after_missing_check_time
+                and expected_chickens > 0
+                and chickens < expected_chickens
+            ):
                 status = (
                     f"MISSING "
                     f"({chickens}/{expected_chickens})"
@@ -531,6 +582,86 @@ def main():
 
             else:
                 safe_state()
+
+            # SEND ONE MISSING-CHICKEN EMAIL AFTER SUNSET
+            missing_chickens = max(
+                expected_chickens - chickens,
+                0
+            )
+
+            already_sent_missing_email = (
+                last_missing_email_date
+                == now.date()
+            )
+
+            if (
+                after_missing_check_time
+                and expected_chickens > 0
+                and missing_chickens > 0
+                and alert_email
+                and not already_sent_missing_email
+            ):
+
+                try:
+                    alerts_directory = os.path.join(
+                        os.path.dirname(
+                            os.path.abspath(__file__)
+                        ),
+                        "alerts"
+                    )
+
+                    os.makedirs(
+                        alerts_directory,
+                        exist_ok=True
+                    )
+
+                    image_filename = (
+                        "missing_chickens_"
+                        + now.strftime(
+                            "%Y%m%d_%H%M%S"
+                        )
+                        + ".jpg"
+                    )
+
+                    image_path = os.path.join(
+                        alerts_directory,
+                        image_filename
+                    )
+
+                    image_saved = False
+
+                    if inside_display is not None:
+                        image_saved = cv2.imwrite(
+                            image_path,
+                            inside_display
+                        )
+
+                    print(
+                        f"Missing chicken alert: "
+                        f"expected {expected_chickens}, "
+                        f"detected {chickens}, "
+                        f"missing {missing_chickens}"
+                    )
+
+                    if image_saved:
+                        send_email_alert(
+                            image_path,
+                            alert_email
+                        )
+
+                    else:
+                        print(
+                            "Missing-chicken image could "
+                            "not be saved"
+                        )
+
+                    last_missing_email_date = now.date()
+
+                except Exception as error:
+                    print(
+                        f"Missing chicken email error: "
+                        f"{error}"
+                    )
 
             # UPDATE OLED
             try:

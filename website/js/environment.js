@@ -104,6 +104,32 @@ function loadEnvironment(){
                     );
 
 
+                /*
+                Save location and sun times so the
+                Settings page can send them to the Pi.
+                */
+
+                localStorage.setItem(
+                    "latitude",
+                    latitude
+                );
+
+                localStorage.setItem(
+                    "longitude",
+                    longitude
+                );
+
+                localStorage.setItem(
+                    "sunrise",
+                    formatTime24Hour(data.sunrise)
+                );
+
+                localStorage.setItem(
+                    "sunset",
+                    formatTime24Hour(data.sunset)
+                );
+
+
                 document.getElementById(
                     "rainChance"
                 ).innerHTML =
@@ -189,6 +215,39 @@ function formatTime(dateTime){
             minute: "2-digit"
         }
     );
+
+}
+
+
+/*
+Converts the sunrise or sunset time into
+24-hour HH:MM format for Python.
+
+Example:
+8:42 PM becomes 20:42
+*/
+
+function formatTime24Hour(dateTime){
+
+    if(!dateTime){
+
+        return "";
+
+    }
+
+
+    const date =
+        new Date(dateTime);
+
+
+    const hours =
+        String(date.getHours()).padStart(2, "0");
+
+    const minutes =
+        String(date.getMinutes()).padStart(2, "0");
+
+
+    return `${hours}:${minutes}`;
 
 }
 

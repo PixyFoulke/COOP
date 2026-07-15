@@ -348,12 +348,13 @@ def save_settings():
 
     try:
 
-        settings = {
-            "chicken_count": int(
-                data["chicken_count"]
-            ),
-            "email": data["email"]
-        }
+        chicken_count = int(
+            data["chicken_count"]
+        )
+
+        email = str(
+            data["email"]
+        ).strip()
 
     except (
         KeyError,
@@ -364,6 +365,40 @@ def save_settings():
         return jsonify({
             "error": "Invalid settings data"
         }), 400
+
+    settings = {
+
+        "chicken_count":
+        chicken_count,
+
+        "email":
+        email,
+
+        "sunrise":
+        data.get(
+            "sunrise",
+            ""
+        ),
+
+        "sunset":
+        data.get(
+            "sunset",
+            ""
+        ),
+
+        "latitude":
+        data.get(
+            "latitude",
+            ""
+        ),
+
+        "longitude":
+        data.get(
+            "longitude",
+            ""
+        )
+
+    }
 
     settings_file = os.path.abspath(
         os.path.join(
@@ -376,7 +411,10 @@ def save_settings():
 
     try:
 
-        with open(settings_file, "w") as file:
+        with open(
+            settings_file,
+            "w"
+        ) as file:
 
             json.dump(
                 settings,
@@ -387,12 +425,18 @@ def save_settings():
     except Exception as error:
 
         return jsonify({
-            "error": f"Could not save settings: {error}"
+            "error":
+            f"Could not save settings: {error}"
         }), 500
 
     return jsonify({
-        "message": "Settings saved",
-        "settings": settings
+
+        "message":
+        "Settings saved",
+
+        "settings":
+        settings
+
     })
 
 
