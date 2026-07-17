@@ -18,8 +18,41 @@ import requests
 
 app = Flask(__name__)
 
+BASE_DIR = os.path.abspath(
+    os.path.join(
+        os.path.dirname(__file__),
+        ".."
+    )
+)
+
+WEBSITE_DIR = os.path.join(
+    BASE_DIR,
+    "website"
+)
+
+
 # ALLOW WEBSITE CONNECTIONS
 CORS(app)
+
+
+# SERVE WEBSITE HOMEPAGE
+@app.route("/")
+def website_home():
+
+    return send_from_directory(
+        WEBSITE_DIR,
+        "index.html"
+    )
+
+
+# SERVE WEBSITE PAGES AND FILES
+@app.route("/<path:filename>")
+def website_files(filename):
+
+    return send_from_directory(
+        WEBSITE_DIR,
+        filename
+    )
 
 
 # SHARED SYSTEM STATE
