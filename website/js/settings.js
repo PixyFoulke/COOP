@@ -1,6 +1,6 @@
 
 const SETTINGS_API =
-"http://192.168.50.2:5000/settings";
+"http://100.98.19.123:5000/settings";
 
 
 function saveSettings(){

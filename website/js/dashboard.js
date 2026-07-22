@@ -1,5 +1,5 @@
 
-const API = "http://192.168.50.2:5000/status";
+const API = "http://100.98.19.123:5000/status";
 
 
 function updateData(){
