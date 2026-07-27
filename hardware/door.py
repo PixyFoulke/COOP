@@ -33,7 +33,7 @@ def door_open():
 
     door_open_pin.value = True
 
-    time.sleep(20)
+    time.sleep(4)
 
     door_open_pin.value = False
 
@@ -46,7 +46,7 @@ def door_close():
 
     door_close_pin.value = True
 
-    time.sleep(20)
+    time.sleep(4)
 
     door_close_pin.value = False
 
